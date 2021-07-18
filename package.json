@@ -12,6 +12,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@persona/infra": "git+https://github.com/project-persona/infra.git",
     "core-js": "^3.15.1",
     "nuxt": "^2.15.7",
     "vuetify": "^2.5.5"

@@ -77,6 +77,6 @@
 </template>
 <script>
 export default {
-  layout: 'dashboard'
+  layout: 'default'
 }
 </script>

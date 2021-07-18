@@ -1,8 +1,8 @@
 <template>
-  <v-row justify="center" align="center">
+  <v-row justify="center" align="center" class="my-auto">
     <v-col cols="12" sm="8" md="6">
-      <v-card class="logo py-4 d-flex justify-center">
-        <Logo />
+      <v-card class="py-4 d-flex justify-center" color="rgb(255, 0, 0, 0)">
+        <Logo-no-bg />
       </v-card>
       <v-card>
         <v-card-actions>

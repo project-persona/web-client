@@ -4,8 +4,10 @@
       <div id="stars" />
       <div id="stars2" />
       <div id="stars3" />
-      <v-cointainer>
-        <Nuxt />
+      <v-cointainer fill-height>
+        <v-layout fill-height>
+          <Nuxt />
+        </v-layout>
       </v-cointainer>
     </v-main>
   </v-app>

@@ -34,6 +34,12 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title v-text="username" />
       <v-spacer />
+      <v-btn class="mr-4" icon>
+        <v-icon class="mx-1">
+          mdi-logout-variant
+        </v-icon>
+        Logout
+      </v-btn>
     </v-app-bar>
     <v-main>
       <v-container>
@@ -60,7 +66,7 @@ export default {
         {
           icon: 'mdi-apps',
           title: 'Home',
-          to: '/'
+          to: '/personas'
         },
         {
           icon: 'mdi-email',
@@ -79,7 +85,7 @@ export default {
         }
       ],
       miniVariant: true,
-      pageName: ''
+      pageName: 'Home'
     }
   },
   computed: {

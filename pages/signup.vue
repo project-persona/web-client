@@ -4,7 +4,7 @@
       <v-card class="py-4 d-flex justify-center" color="rgb(255, 0, 0, 0)">
         <Logo-no-bg />
       </v-card>
-      <v-card style="max-width:50%" class="mx-auto mt-3" color="rgb(255, 0, 0, 0)">
+      <v-card class="mx-auto mt-3" color="rgb(255, 0, 0, 0)">
         <v-form
           ref="form"
           v-model="valid"

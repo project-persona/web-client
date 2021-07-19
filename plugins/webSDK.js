@@ -20,21 +20,21 @@ export default {
     Vue.prototype.$accountLogin = async function (email, password) {
       let response
       try {
-        response = await firebase.app().auth().loginWithEmailPassword(email, password)
+        await firebase.app().auth().signInWithEmailAndPassword(email, password)
       } catch (err) {
-        return err
+        return { success: false, msg: err.message }
       }
-      return response
+      return { success: true, msg: response }
     }
 
     Vue.prototype.$accountSignup = async function (email, password) {
       let response
       try {
-        response = await firebase.app().auth().createUserWithEmailAndPassword(email, password)
+        await firebase.app().auth().createUserWithEmailAndPassword(email, password)
       } catch (err) {
-        return err
+        return { success: false, msg: err.message }
       }
-      return response
+      return { success: true, msg: response }
     }
   }
 }

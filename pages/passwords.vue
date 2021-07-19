@@ -12,10 +12,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="pw in pwList"
-          :key="pw.site"
-        >
+        <tr v-for="pw in pwList" :key="pw.site" align="center">
           <td>{{ pw.site.toUpperCase() }}</td>
           <td
             class="text-center"
@@ -33,9 +30,8 @@
 </template>
 <script>
 const pwList = [
-  { password: '0', site: 'Vegetables' },
-  { password: '1', site: 'Cheese' },
-  { password: '2', site: 'Google' }
+  { password: '123456', site: 'Facebook' },
+  { password: '2453454', site: 'Google' }
 ]
 for (let i = 0; i < pwList.length; i++) {
   pwList[i].show = false

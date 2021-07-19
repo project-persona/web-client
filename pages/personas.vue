@@ -12,10 +12,18 @@
           exact
           @click="toMailbox"
         >
+          <v-list-item-avatar>
+            <v-icon>mdi-account</v-icon>
+          </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title v-text="persona.name" />
             <v-list-item-subtitle v-text="persona.email" />
           </v-list-item-content>
+          <v-list-item-action>
+            <v-btn icon>
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+          </v-list-item-action>
         </v-list-item>
       </v-list>
       <p v-if="personas.length" class="bottom-text">

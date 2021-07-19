@@ -4,7 +4,7 @@
       <v-card class="py-4 d-flex justify-center" color="rgb(255, 0, 0, 0)">
         <Logo-no-bg />
       </v-card>
-      <v-card style="max-width:50%" class="mx-auto mt-3" color="rgb(255, 0, 0, 0)">
+      <v-card style="max-width:70%" class="mx-auto mt-3" color="rgb(255, 0, 0, 0)">
         <v-form>
           <v-container>
             <v-row>
@@ -76,8 +76,8 @@ export default {
       show: false,
       email: '',
       pwd: '',
-      emailRules: v => /.+@.+/.test(v) || 'E-mail must be valid',
-      pwdRules: v => v.length >= 6 || 'Min 6 characters'
+      emailRules: [v => /.+@.+/.test(v) || 'E-mail must be valid'],
+      pwdRules: [v => v.length >= 6 || 'Min 6 characters']
     }
   }
 }

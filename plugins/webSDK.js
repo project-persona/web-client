@@ -14,10 +14,10 @@ export default {
 
   install (Vue, options) {
     // create a mixin
-    const app = firebase.initializeApp(firebaseConfig)
-    Vue.client = Client.create(app)
+    Vue.prototype.$fireApp = firebase.initializeApp(firebaseConfig)
+    Vue.prototype.$client = Client.create(Vue.prototype.$fireApp)
 
-    Vue.accountLogin = async function (email, password) {
+    Vue.prototype.$accountLogin = async function (email, password) {
       let response
       try {
         response = await firebase.app().auth().loginWithEmailPassword(email, password)
@@ -27,7 +27,7 @@ export default {
       return response
     }
 
-    Vue.accountSignup = async function (email, password) {
+    Vue.prototype.$accountSignup = async function (email, password) {
       let response
       try {
         response = await firebase.app().auth().createUserWithEmailAndPassword(email, password)

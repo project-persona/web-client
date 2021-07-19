@@ -19,11 +19,15 @@
             <v-list-item-title v-text="persona.name" />
             <v-list-item-subtitle v-text="persona.email" />
           </v-list-item-content>
-          <v-list-item-action>
-            <v-btn icon>
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-          </v-list-item-action>
+          <v-list-item-icon>
+            <v-badge
+              :content="mail"
+              :value="mail"
+              overlap
+            >
+              <v-icon>mdi-email</v-icon>
+            </v-badge>
+          </v-list-item-icon>
         </v-list-item>
       </v-list>
       <p v-if="personas.length" class="bottom-text">
@@ -303,7 +307,8 @@ export default {
         'Female',
         'Non-Binary'
       ],
-      date: null
+      date: null,
+      mail: 3
     }
   },
   computed: {

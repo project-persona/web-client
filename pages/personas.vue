@@ -35,10 +35,9 @@
           </v-btn>
         </template>
         <v-card>
-          <v-toolbar>
+          <v-toolbar elevation="0">
             <v-btn
               icon
-              dark
               @click="dialog = false"
             >
               <v-icon>mdi-close</v-icon>
@@ -48,6 +47,7 @@
             <v-toolbar-items>
               <v-btn
                 text
+                :disabled="isDisable"
                 @click="createPersona"
               >
                 Create
@@ -56,10 +56,10 @@
           </v-toolbar>
           <v-form ref="form">
             <v-container>
-              <v-row>
+              <v-row dense>
                 <v-col>
                   <v-text-field
-                    v-model="firstname"
+                    v-model="info.firstname"
                     label="First name"
                     dense
                     outlined
@@ -68,7 +68,7 @@
                 </v-col>
                 <v-col>
                   <v-text-field
-                    v-model="lastname"
+                    v-model="info.lastname"
                     label="Last name"
                     dense
                     outlined
@@ -76,7 +76,7 @@
                   />
                 </v-col>
               </v-row>
-              <v-row>
+              <v-row dense>
                 <v-col
                   cols="12"
                   md="6"
@@ -124,12 +124,12 @@
                   </v-menu>
                 </v-col>
               </v-row>
-              <v-row>
+              <v-row dense>
                 <v-col
                   cols="12"
                 >
                   <v-text-field
-                    v-model="addr1"
+                    v-model="info.addr1"
                     label="Address Line 1"
                     dense
                     outlined
@@ -140,7 +140,7 @@
                   cols="12"
                 >
                   <v-text-field
-                    v-model="addr2"
+                    v-model="info.addr2"
                     label="Address Line 2"
                     dense
                     outlined
@@ -148,13 +148,13 @@
                   />
                 </v-col>
               </v-row>
-              <v-row>
+              <v-row dense>
                 <v-col
                   cols="12"
                   md="6"
                 >
                   <v-text-field
-                    v-model="country"
+                    v-model="info.country"
                     label="Country"
                     dense
                     outlined
@@ -166,7 +166,7 @@
                   md="6"
                 >
                   <v-text-field
-                    v-model="state"
+                    v-model="info.state"
                     label="State/Province"
                     dense
                     outlined
@@ -174,13 +174,13 @@
                   />
                 </v-col>
               </v-row>
-              <v-row>
+              <v-row dense>
                 <v-col
                   cols="12"
                   md="6"
                 >
                   <v-text-field
-                    v-model="city"
+                    v-model="info.city"
                     label="City"
                     dense
                     outlined
@@ -192,7 +192,7 @@
                   md="6"
                 >
                   <v-text-field
-                    v-model="zipcode"
+                    v-model="info.zipcode"
                     label="Zip code"
                     dense
                     outlined
@@ -200,19 +200,24 @@
                   />
                 </v-col>
               </v-row>
-              <v-row>
+              <v-row dense>
                 <v-col
-                  cols="12"
+                  cols="8"
                 >
                   <v-text-field
-                    v-model="email"
+                    v-model="info.email"
                     label="Email"
-                    hint="@persona.tk"
+                    hint="This cannot be changed later!"
                     dense
                     outlined
                     clearable
                   />
                 </v-col>
+                <v-col align-self="center">
+                  <p>@persona.tk</p>
+                </v-col>
+              </v-row>
+              <v-row dense>
                 <v-col
                   cols="2"
                 >
@@ -261,25 +266,38 @@ export default {
           email: 'cole@sfu.ca'
         }
       ],
+      info: {
+        firstname: '',
+        lastname: '',
+        addr1: '',
+        addr2: '',
+        country: '',
+        state: '',
+        city: '',
+        zipcode: '',
+        email: ''
+      },
       dialog: false,
-      firstname: '',
-      lastname: '',
+      activePicker: null,
+      menu: false,
       select: null,
       gender: [
         'Male',
         'Female',
         'Non-Binary'
       ],
-      activePicker: null,
-      date: null,
-      menu: false,
-      addr1: '',
-      addr2: '',
-      country: '',
-      state: '',
-      city: '',
-      zipcode: '',
-      email: ''
+      date: null
+    }
+  },
+  computed: {
+    isDisable () {
+      let result = false
+      for (const item in this.info) {
+        if (!this.info[item]) {
+          result = true
+        }
+      }
+      return result
     }
   },
   watch: {
@@ -295,11 +313,10 @@ export default {
       this.$refs.form.reset()
     },
     autoForm () {
-      if (!this.firstname) {
-        this.firstname = 'Tony'
-      }
-      if (!this.lastname) {
-        this.lastname = 'Liu'
+      for (const item in this.info) {
+        if (!this.info[item]) {
+          this.info[item] = 'Filled'
+        }
       }
       if (!this.select) {
         this.select = this.gender[0]
@@ -307,12 +324,9 @@ export default {
       if (!this.date) {
         this.date = new Date(Date.now()).toISOString().substr(0, 10)
       }
-      if (!this.email) {
-        this.email = 'tonyliu'
-      }
     },
     createPersona () {
-      this.personas.push({ name: this.firstname, email: this.email + '@persona.tk' })
+      this.personas.push({ name: this.info.firstname, email: this.info.email + '@persona.tk' })
       this.reset()
       this.dialog = false
     }

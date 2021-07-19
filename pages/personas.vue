@@ -54,7 +54,7 @@
               </v-btn>
             </v-toolbar-items>
           </v-toolbar>
-          <v-form ref="form">
+          <v-form ref="form" class="form">
             <v-container>
               <v-row dense>
                 <v-col>
@@ -213,8 +213,8 @@
                     clearable
                   />
                 </v-col>
-                <v-col align-self="center">
-                  <p>@persona.tk</p>
+                <v-col class="email-tail">
+                  <h4>@persona.tk</h4>
                 </v-col>
               </v-row>
               <v-row dense>
@@ -337,8 +337,12 @@ export default {
 .card {
   margin: 20px;
 }
-.v-row {
-  padding-top: 0;
-  padding-bottom: 0;
+.form {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+.email-tail {
+  align-self: center;
+  padding-bottom: 2rem;
 }
 </style>

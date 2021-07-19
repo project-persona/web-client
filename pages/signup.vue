@@ -4,7 +4,7 @@
       <v-card class="py-4 d-flex justify-center" color="rgb(255, 0, 0, 0)">
         <Logo-no-bg />
       </v-card>
-      <v-card style="max-width:70%" class="mx-auto mt-3" color="rgb(255, 0, 0, 0)">
+      <v-card style="max-width:50%" class="mx-auto mt-3" color="rgb(255, 0, 0, 0)">
         <v-form>
           <v-container>
             <v-row>
@@ -32,36 +32,36 @@
                 />
               </v-col>
             </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  v-model="confirmPwd"
+                  label="Confirm Password"
+                  :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+                  :rules="confirmRules"
+                  :type="show ? 'text' : 'password'"
+                  counter
+                  required
+                  @click:append="show = !show"
+                />
+              </v-col>
+            </v-row>
           </v-container>
         </v-form>
         <v-card-actions>
           <v-spacer />
           <v-btn
             color="accent"
-            nuxt
-            to="/signup"
+            @click="clear"
           >
-            Sign up
+            clear
           </v-btn>
           <v-btn
             color="primary"
             nuxt
             to="/personas"
           >
-            Sign in
-          </v-btn>
-        </v-card-actions>
-        <h3 class="seperate font-weight-light">
-          <span>OR</span>
-        </h3>
-        <v-card-actions>
-          <v-btn
-            color="secondary"
-            nuxt
-            to="/"
-          >
-            Continue using
-            <v-icon>mdi-google</v-icon>
+            Sign up
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -76,23 +76,18 @@ export default {
       show: false,
       email: '',
       pwd: '',
+      confirmPwd: '',
       emailRules: [v => /.+@.+/.test(v) || 'E-mail must be valid'],
-      pwdRules: [v => v.length >= 6 || 'Min 6 characters']
+      pwdRules: [v => v.length >= 6 || 'Min 6 characters'],
+      confirmRules: [v => this.pwd === this.confirmPwd || 'Passwords not match']
+    }
+  },
+  methods: {
+    clear () {
+      this.email = ''
+      this.pwd = ''
+      this.confirmPwd = ''
     }
   }
 }
 </script>
-<style scoped>
-.seperate {
-   width: 100%;
-   text-align: center;
-   border-bottom: 1px solid #FFF;
-   line-height: 0.1em;
-   margin: 10px 0 20px;
-}
-
-.seperate span {
-    background:#000;
-    padding:0 10px;
-}
-</style>

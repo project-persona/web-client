@@ -1,249 +1,258 @@
 <template>
   <v-row>
     <v-col>
-      <h1>Personas</h1>
-      <v-card
-        v-for="(persona, p) in personas"
-        :key="p"
-        shaped
-        outlined
-        class="card"
-      >
-        <v-card-title v-text="persona.name" />
-        <v-card-subtitle v-text="persona.email" />
-      </v-card>
-      <p v-if="personas.length">
+      <div class="pagetitle">
+        <span>Personas</span>
+      </div>
+      <v-list>
+        <v-list-item
+          v-for="(persona, p) in personas"
+          :key="p"
+          router
+          exact
+          @click="toMailbox"
+        >
+          <v-list-item-content>
+            <v-list-item-title v-text="persona.name" />
+            <v-list-item-subtitle v-text="persona.email" />
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+      <p v-if="personas.length" class="bottom-text">
         Select an existing persona, or create a new persona.
       </p>
-      <p v-else>
+      <p v-else class="bottom-text">
         Create your first persona.
       </p>
-      <v-dialog
-        v-model="dialog"
-        fullscreen
-        hide-overlay
-        transition="dialog-bottom-transition"
-      >
-        <template #activator="{ on, attrs }">
-          <v-btn
-            color="primary"
-            dark
-            v-bind="attrs"
-            v-on="on"
+      <v-row justify="center">
+        <v-dialog
+          v-model="dialog"
+          fullscreen
+          hide-overlay
+          transition="dialog-bottom-transition"
+          class="text-center"
+        >
+          <template
+            #activator="{ on, attrs }"
           >
-            Create New
-          </v-btn>
-        </template>
-        <v-card>
-          <v-toolbar elevation="0">
             <v-btn
-              icon
-              @click="dialog = false"
+              v-bind="attrs"
+              v-on="on"
             >
-              <v-icon>mdi-close</v-icon>
+              Create New
             </v-btn>
-            <v-toolbar-title>Persona information</v-toolbar-title>
-            <v-spacer />
-            <v-toolbar-items>
+          </template>
+          <v-card>
+            <v-toolbar elevation="0">
               <v-btn
-                text
-                :disabled="isDisable"
-                @click="createPersona"
+                icon
+                @click="dialog = false"
               >
-                Create
+                <v-icon>mdi-close</v-icon>
               </v-btn>
-            </v-toolbar-items>
-          </v-toolbar>
-          <v-form ref="form" class="form">
-            <v-container>
-              <v-row dense>
-                <v-col>
-                  <v-text-field
-                    v-model="info.firstname"
-                    label="First name"
-                    dense
-                    outlined
-                    clearable
-                  />
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    v-model="info.lastname"
-                    label="Last name"
-                    dense
-                    outlined
-                    clearable
-                  />
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col
-                  cols="12"
-                  md="6"
+              <v-toolbar-title>Persona information</v-toolbar-title>
+              <v-spacer />
+              <v-toolbar-items>
+                <v-btn
+                  text
+                  :disabled="isDisable"
+                  @click="createPersona"
                 >
-                  <v-select
-                    v-model="select"
-                    :items="gender"
-                    label="Gender"
-                    dense
-                    outlined
-                    clearable
-                  />
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <v-menu
-                    ref="menu"
-                    v-model="menu"
-                    :close-on-content-click="false"
-                    transition="scale-transition"
-                    offset-y
-                    min-width="auto"
-                  >
-                    <template #activator="{ on, attrs }">
-                      <v-text-field
-                        v-model="date"
-                        label="Birthdate"
-                        readonly
-                        v-bind="attrs"
-                        dense
-                        outlined
-                        clearable
-                        v-on="on"
-                      />
-                    </template>
-                    <v-date-picker
-                      v-model="date"
-                      :active-picker.sync="activePicker"
-                      :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
-                      min="1950-01-01"
-                      @change="save"
+                  Create
+                </v-btn>
+              </v-toolbar-items>
+            </v-toolbar>
+            <v-form ref="form" class="form">
+              <v-container>
+                <v-row dense>
+                  <v-col>
+                    <v-text-field
+                      v-model="info.firstname"
+                      label="First name"
+                      dense
+                      outlined
+                      clearable
                     />
-                  </v-menu>
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col
-                  cols="12"
-                >
-                  <v-text-field
-                    v-model="info.addr1"
-                    label="Address Line 1"
-                    dense
-                    outlined
-                    clearable
-                  />
-                </v-col>
-                <v-col
-                  cols="12"
-                >
-                  <v-text-field
-                    v-model="info.addr2"
-                    label="Address Line 2"
-                    dense
-                    outlined
-                    clearable
-                  />
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <v-text-field
-                    v-model="info.country"
-                    label="Country"
-                    dense
-                    outlined
-                    clearable
-                  />
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <v-text-field
-                    v-model="info.state"
-                    label="State/Province"
-                    dense
-                    outlined
-                    clearable
-                  />
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <v-text-field
-                    v-model="info.city"
-                    label="City"
-                    dense
-                    outlined
-                    clearable
-                  />
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <v-text-field
-                    v-model="info.zipcode"
-                    label="Zip code"
-                    dense
-                    outlined
-                    clearable
-                  />
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col
-                  cols="8"
-                >
-                  <v-text-field
-                    v-model="info.email"
-                    label="Email"
-                    hint="This cannot be changed later!"
-                    dense
-                    outlined
-                    clearable
-                  />
-                </v-col>
-                <v-col class="email-tail">
-                  <h4>@persona.tk</h4>
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col
-                  cols="2"
-                >
-                  <v-btn
-                    text
-                    outlined
-                    @click="autoForm"
+                  </v-col>
+                  <v-col>
+                    <v-text-field
+                      v-model="info.lastname"
+                      label="Last name"
+                      dense
+                      outlined
+                      clearable
+                    />
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col
+                    cols="12"
+                    md="6"
                   >
-                    Autofill
-                  </v-btn>
-                </v-col>
-                <v-col
-                  cols="2"
-                >
-                  <v-btn
-                    text
-                    @click="reset"
+                    <v-select
+                      v-model="select"
+                      :items="gender"
+                      label="Gender"
+                      dense
+                      outlined
+                      clearable
+                    />
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    md="6"
                   >
-                    Clear
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-form>
-        </v-card>
-      </v-dialog>
+                    <v-menu
+                      ref="menu"
+                      v-model="menu"
+                      :close-on-content-click="false"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="auto"
+                    >
+                      <template #activator="{ on, attrs }">
+                        <v-text-field
+                          v-model="date"
+                          label="Birthdate"
+                          readonly
+                          v-bind="attrs"
+                          dense
+                          outlined
+                          clearable
+                          v-on="on"
+                        />
+                      </template>
+                      <v-date-picker
+                        v-model="date"
+                        :active-picker.sync="activePicker"
+                        :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
+                        min="1950-01-01"
+                        @change="save"
+                      />
+                    </v-menu>
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col
+                    cols="12"
+                  >
+                    <v-text-field
+                      v-model="info.addr1"
+                      label="Address Line 1"
+                      dense
+                      outlined
+                      clearable
+                    />
+                  </v-col>
+                  <v-col
+                    cols="12"
+                  >
+                    <v-text-field
+                      v-model="info.addr2"
+                      label="Address Line 2"
+                      dense
+                      outlined
+                      clearable
+                    />
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col
+                    cols="12"
+                    md="6"
+                  >
+                    <v-text-field
+                      v-model="info.country"
+                      label="Country"
+                      dense
+                      outlined
+                      clearable
+                    />
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    md="6"
+                  >
+                    <v-text-field
+                      v-model="info.state"
+                      label="State/Province"
+                      dense
+                      outlined
+                      clearable
+                    />
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col
+                    cols="12"
+                    md="6"
+                  >
+                    <v-text-field
+                      v-model="info.city"
+                      label="City"
+                      dense
+                      outlined
+                      clearable
+                    />
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    md="6"
+                  >
+                    <v-text-field
+                      v-model="info.zipcode"
+                      label="Zip code"
+                      dense
+                      outlined
+                      clearable
+                    />
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col
+                    cols="8"
+                  >
+                    <v-text-field
+                      v-model="info.email"
+                      label="Email"
+                      hint="This cannot be changed later!"
+                      dense
+                      outlined
+                      clearable
+                    />
+                  </v-col>
+                  <v-col class="email-tail">
+                    <h4>@persona.tk</h4>
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col
+                    cols="2"
+                  >
+                    <v-btn
+                      text
+                      outlined
+                      @click="autoForm"
+                    >
+                      Autofill
+                    </v-btn>
+                  </v-col>
+                  <v-col
+                    cols="2"
+                  >
+                    <v-btn
+                      text
+                      @click="reset"
+                    >
+                      Clear
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-form>
+          </v-card>
+        </v-dialog>
+      </v-row>
     </v-col>
   </v-row>
 </template>
@@ -306,6 +315,12 @@ export default {
     }
   },
   methods: {
+    // getPersonas () {
+    //   return this.$client.getPersonas
+    // },
+    toMailbox () {
+      this.$router.push('/mailbox')
+    },
     save (date) {
       this.$refs.menu.save(date)
     },
@@ -327,6 +342,7 @@ export default {
     },
     createPersona () {
       this.personas.push({ name: this.info.firstname, email: this.info.email + '@persona.tk' })
+      // this.$client.personas.createPersona(this.info)
       this.reset()
       this.dialog = false
     }
@@ -334,8 +350,14 @@ export default {
 }
 </script>
 <style scoped>
-.card {
-  margin: 20px;
+.pagetitle {
+  font-size: 3rem;
+  font-weight: bold;
+}
+.bottom-text {
+  text-align: center;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 .form {
   padding-top: 3rem;

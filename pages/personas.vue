@@ -79,7 +79,7 @@
                 <v-row dense>
                   <v-col>
                     <v-text-field
-                      v-model="info.firstname"
+                      v-model="info.firstName"
                       label="First name"
                       dense
                       outlined
@@ -88,7 +88,7 @@
                   </v-col>
                   <v-col>
                     <v-text-field
-                      v-model="info.lastname"
+                      v-model="info.lastName"
                       label="Last name"
                       dense
                       outlined
@@ -149,7 +149,7 @@
                     cols="12"
                   >
                     <v-text-field
-                      v-model="info.addr1"
+                      v-model="info.address.line1"
                       label="Address Line 1"
                       dense
                       outlined
@@ -160,7 +160,7 @@
                     cols="12"
                   >
                     <v-text-field
-                      v-model="info.addr2"
+                      v-model="info.address.line2"
                       label="Address Line 2"
                       dense
                       outlined
@@ -174,7 +174,7 @@
                     md="6"
                   >
                     <v-text-field
-                      v-model="info.country"
+                      v-model="info.address.country"
                       label="Country"
                       dense
                       outlined
@@ -186,7 +186,7 @@
                     md="6"
                   >
                     <v-text-field
-                      v-model="info.state"
+                      v-model="info.address.state"
                       label="State/Province"
                       dense
                       outlined
@@ -200,7 +200,7 @@
                     md="6"
                   >
                     <v-text-field
-                      v-model="info.city"
+                      v-model="info.address.city"
                       label="City"
                       dense
                       outlined
@@ -212,7 +212,7 @@
                     md="6"
                   >
                     <v-text-field
-                      v-model="info.zipcode"
+                      v-model="info.address.zipCode"
                       label="Zip code"
                       dense
                       outlined
@@ -273,29 +273,31 @@ export default {
   layout: 'dashboard',
   data () {
     return {
-      personas: [
-        {
-          name: 'Lucy',
-          email: 'lucyzhong@sfu.ca'
-        },
-        {
-          name: 'Abby',
-          email: 'abby@sfu.ca'
-        },
-        {
-          name: 'Cole',
-          email: 'cole@sfu.ca'
-        }
-      ],
+      // personas: [
+      //   {
+      //     name: 'Lucy',
+      //     email: 'lucyzhong@sfu.ca'
+      //   },
+      //   {
+      //     name: 'Abby',
+      //     email: 'abby@sfu.ca'
+      //   },
+      //   {
+      //     name: 'Cole',
+      //     email: 'cole@sfu.ca'
+      //   }
+      // ],
       info: {
-        firstname: '',
-        lastname: '',
-        addr1: '',
-        addr2: '',
-        country: '',
-        state: '',
-        city: '',
-        zipcode: '',
+        firstName: '',
+        lastName: '',
+        address: {
+          line1: '',
+          line2: '',
+          country: '',
+          state: '',
+          city: '',
+          zipCode: ''
+        },
         email: ''
       },
       dialog: false,
@@ -320,6 +322,11 @@ export default {
         }
       }
       return result
+    },
+    personas () {
+      const personas = this.getPersonaList()
+      console.log(personas)
+      return personas
     }
   },
   watch: {
@@ -328,9 +335,9 @@ export default {
     }
   },
   methods: {
-    // getPersonas () {
-    //   return this.$client.getPersonas
-    // },
+    async getPersonaList () {
+      await this.$client.personas.list()
+    },
     toMailbox () {
       this.$router.push('/mailbox')
     },
@@ -342,6 +349,13 @@ export default {
     },
     autoForm () {
       for (const item in this.info) {
+        if (this.info[item] === this.info.address) {
+          for (const addr in this.info.address) {
+            if (!this.info.address[addr]) {
+              this.info.address[addr] = 'Filled'
+            }
+          }
+        }
         if (!this.info[item]) {
           this.info[item] = 'Filled'
         }
@@ -353,9 +367,9 @@ export default {
         this.date = new Date(Date.now()).toISOString().substr(0, 10)
       }
     },
-    createPersona () {
-      this.personas.push({ name: this.info.firstname, email: this.info.email + '@persona.tk' })
-      // this.$client.personas.createPersona(this.info)
+    async createPersona () {
+      // this.personas.push({ name: this.info.firstName, email: this.info.email + '@persona.tk' })
+      await this.$client.create(this.info)
       this.reset()
       this.dialog = false
     }

@@ -273,20 +273,20 @@ export default {
   layout: 'dashboard',
   data () {
     return {
-      // personas: [
-      //   {
-      //     name: 'Lucy',
-      //     email: 'lucyzhong@sfu.ca'
-      //   },
-      //   {
-      //     name: 'Abby',
-      //     email: 'abby@sfu.ca'
-      //   },
-      //   {
-      //     name: 'Cole',
-      //     email: 'cole@sfu.ca'
-      //   }
-      // ],
+      personas: [
+        {
+          name: 'Lucy',
+          email: 'lucyzhong@sfu.ca'
+        },
+        {
+          name: 'Abby',
+          email: 'abby@sfu.ca'
+        },
+        {
+          name: 'Cole',
+          email: 'cole@sfu.ca'
+        }
+      ],
       info: {
         firstName: '',
         lastName: '',
@@ -322,12 +322,11 @@ export default {
         }
       }
       return result
-    },
-    personas () {
-      const personas = this.getPersonaList()
-      console.log(personas)
-      return personas
     }
+    // personas () {
+    //   const personas = this.getPersonaList()
+    //   return personas
+    // }
   },
   watch: {
     menu (val) {
@@ -335,9 +334,9 @@ export default {
     }
   },
   methods: {
-    async getPersonaList () {
-      await this.$client.personas.list()
-    },
+    // async getPersonaList () {
+    //   await this.$client.personas.list()
+    // },
     toMailbox () {
       this.$router.push('/mailbox')
     },
@@ -367,9 +366,9 @@ export default {
         this.date = new Date(Date.now()).toISOString().substr(0, 10)
       }
     },
-    async createPersona () {
-      // this.personas.push({ name: this.info.firstName, email: this.info.email + '@persona.tk' })
-      await this.$client.create(this.info)
+    createPersona () {
+      this.personas.push({ name: this.info.firstName, email: this.info.email + '@persona.tk' })
+      // await this.$client.create(this.info)
       this.reset()
       this.dialog = false
     }

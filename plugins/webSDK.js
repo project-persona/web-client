@@ -15,7 +15,7 @@ export default {
   install (Vue, options) {
     // create a mixin
     Vue.prototype.$fireApp = firebase.initializeApp(firebaseConfig)
-    Vue.prototype.$client = Client.create(Vue.prototype.$fireApp)
+    Vue.prototype.$client = Client.create(Vue.prototype.$fireApp, '/api')
 
     Vue.prototype.$accountLogin = async function (email, password) {
       let response

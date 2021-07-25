@@ -74,7 +74,7 @@
                 </v-btn>
               </v-toolbar-items>
             </v-toolbar>
-            <v-form ref="form" class="form">
+            <v-form ref="form" class="form" @submit.prevent="submit">
               <v-container>
                 <v-row dense>
                   <v-col>

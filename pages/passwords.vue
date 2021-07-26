@@ -25,14 +25,62 @@
                   {{ pw.show ? 'mdi-eye' : 'mdi-eye-off' }}
                 </v-icon>
               </v-btn>
-              <v-btn
-                text
-                outlined
-                class="icon"
-                @click="edit"
+              <v-dialog
+                v-model="dialogEdit"
+                fullscreen
+                hide-overlay
+                transition="dialog-bottom-transition"
               >
-                Edit
-              </v-btn>
+                <template #activator="{ on, attrs }">
+                  <v-btn
+                    text
+                    outlined
+                    class="icon"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    Edit
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-toolbar
+                    dark
+                  >
+                    <v-btn
+                      icon
+                      dark
+                      @click="cancelEdit(pw)"
+                    >
+                      <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                    <v-toolbar-title>Edit password</v-toolbar-title>
+                    <v-spacer />
+                    <v-toolbar-items>
+                      <v-btn
+                        dark
+                        text
+                        bottom
+                        :disabled="disableEdit"
+                        @click="edit(pw)"
+                      >
+                        Save
+                      </v-btn>
+                    </v-toolbar-items>
+                  </v-toolbar>
+                  <v-form
+                    ref="'formEdit'+pw.site"
+                    lazy-validation
+                  >
+                    <h3> {{ pw.site.toUpperCase() }} </h3>
+                    <v-text-field
+                      v-model="passwordEdit"
+                      :rules="[v => !!v || 'Password is required']"
+                      label="Password"
+                      required
+                    />
+                  </v-form>
+                </v-card>
+              </v-dialog>
               <v-btn
                 text
                 outlined
@@ -72,7 +120,7 @@
               >
                 <v-icon>mdi-close</v-icon>
               </v-btn>
-              <v-toolbar-title>Settings</v-toolbar-title>
+              <v-toolbar-title>Add a new password</v-toolbar-title>
               <v-spacer />
               <v-toolbar-items>
                 <v-btn
@@ -87,8 +135,7 @@
               </v-toolbar-items>
             </v-toolbar>
             <v-form
-              ref="form"
-              v-model="valid"
+              ref="formAdd"
               lazy-validation
             >
               <v-text-field
@@ -123,6 +170,8 @@ export default {
   data () {
     return {
       dialog: false,
+      dialogEdit: false,
+      passwordEdit: '',
       pwList,
       pwData: {
         site: '',
@@ -135,28 +184,45 @@ export default {
       if (this.pwData.site !== '' && this.pwData.password !== '') {
         return false
       } else { return true }
+    },
+    disableEdit () {
+      if (this.password !== '') {
+        return false
+      } else { return true }
     }
   },
   methods: {
     create () {
-      this.reset()
       // await
       this.pwList.push({ site: this.pwData.site, password: this.pwData.password })
       this.dialog = false
       for (let i = 0; i < pwList.length; i++) {
         pwList[i].show = false
       }
+      this.resetAdd()
       // console.log(pwList)
     },
-    reset () {
-      this.$refs.form.reset()
+    resetAdd () {
+      this.$refs.formAdd.reset()
     },
-    cancel () {
+    resetEdit (pw) {
+      pw.passwordEdit = ''
+    },
+    cancel (pw) {
       this.dialog = false
-      this.reset()
+      this.resetAdd(pw)
     },
-    edit () {
-      //
+    cancelEdit () {
+      this.dialogEdit = false
+      // this.resetEdit()
+    },
+    edit (pw) {
+      for (let i = 0; i < pwList.length; i++) {
+        if (pwList[i].site === pw.site) {
+          pwList[i].password = this.passwordEdit
+        }
+      }
+      // awit
     },
     deletePw () {
       //

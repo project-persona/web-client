@@ -269,6 +269,14 @@
   </v-row>
 </template>
 <script>
+function Persona (lastName, firstName, birthday, gender, email, address) {
+  this.lastName = lastName
+  this.firstName = firstName
+  this.birthday = birthday
+  this.gender = gender
+  this.email = email
+  this.address = address
+}
 export default {
   layout: 'dashboard',
   data () {
@@ -366,9 +374,11 @@ export default {
         this.date = new Date(Date.now()).toISOString().substr(0, 10)
       }
     },
-    createPersona () {
-      this.personas.push({ name: this.info.firstName, email: this.info.email + '@persona.tk' })
-      // await this.$client.create(this.info)
+    async createPersona () {
+      const newPersona = new Persona(this.info.lastName, this.info.firstName, this.date, this.select, this.info.email, this.info.address)
+      this.personas.push(newPersona)
+      const res = await this.$client.personas.create(newPersona)
+      console.log(res)
       this.reset()
       this.dialog = false
     }

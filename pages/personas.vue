@@ -19,7 +19,21 @@
             <v-list-item-title v-text="persona.firstName + ' ' + persona.lastName" />
             <v-list-item-subtitle v-text="persona.email" />
           </v-list-item-content>
-          <v-list-item-icon>
+          <v-list-item-action class="mr-2">
+            <v-btn icon @click.stop="editPersona(persona._id)">
+              <v-icon>
+                mdi-account-edit
+              </v-icon>
+            </v-btn>
+          </v-list-item-action>
+          <v-list-item-action>
+            <v-btn icon @click.stop="deletePersona(persona._id)">
+              <v-icon>
+                mdi-delete
+              </v-icon>
+            </v-btn>
+          </v-list-item-action>
+          <v-list-item-icon class="my-auto">
             <v-badge
               :content="mail"
               :value="mail"
@@ -50,6 +64,7 @@
             <v-btn
               v-bind="attrs"
               v-on="on"
+              @click="onCreateFormOpen"
             >
               Create New
             </v-btn>
@@ -66,11 +81,18 @@
               <v-spacer />
               <v-toolbar-items>
                 <v-btn
+                  v-if="forCreate"
                   text
-                  :disabled="isDisable"
                   @click="createPersona"
                 >
                   Create
+                </v-btn>
+                <v-btn
+                  v-else
+                  text
+                  @click="editPersona"
+                >
+                  Save
                 </v-btn>
               </v-toolbar-items>
             </v-toolbar>
@@ -304,6 +326,8 @@ export default {
   layout: 'dashboard',
   data () {
     return {
+      forCreate: true,
+      formOpened: false,
       overlay: true,
       snackbar: false,
       snackbarMsg: '',
@@ -335,15 +359,15 @@ export default {
     }
   },
   computed: {
-    isDisable () {
-      let result = false
-      for (const item in this.info) {
-        if (!this.info[item]) {
-          result = true
-        }
-      }
-      return result
-    }
+    // isDisable () {
+    //   let result = false
+    //   for (const item in this.info) {
+    //     if (!this.info[item]) {
+    //       result = true
+    //     }
+    //   }
+    //   return result
+    // }
     // personas () {
     //   const personas = this.getPersonaList()
     //   return personas
@@ -359,9 +383,39 @@ export default {
     this.overlay = false
   },
   methods: {
-    // async getPersonaList () {
-    //   await this.$client.personas.list()
-    // },
+    onCreateFormOpen () {
+      this.forCreate = true
+      if (this.formOpened) {
+        this.reset()
+      } else {
+        this.formOpened = true
+      }
+    },
+    editPersona (id) {
+      this.forCreate = false
+      this.formOpened = true
+      const targetPersona = this.personas.find((item) => {
+        return item._id === id
+      })
+      this.select = targetPersona.gender
+      this.date = targetPersona.birthday
+      this.info = { ...targetPersona }
+      this.info.address = { ...targetPersona.address }
+      this.dialog = true
+    },
+    async deletePersona (id) {
+      this.overlay = true
+      try {
+        await this.$client.personas.delete(id)
+        this.personas = await this.$client.personas.list()
+      } catch (error) {
+        this.snackbarMsg = 'An error occurred, please try again'
+        this.snackbar = true
+      }
+      this.overlay = false
+      this.snackbarMsg = 'Delete Successfully'
+      this.snackbar = true
+    },
     toMailbox () {
       this.$router.push('/mailbox')
     },

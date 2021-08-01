@@ -18,7 +18,7 @@ export default {
     // for development
     // Vue.prototype.$client = Client.create(Vue.prototype.$fireApp, 'http://localhost:8080/api')
     // for production
-    Vue.prototype.$client = Client.create(Vue.prototype.$fireApp, '/api')
+    Vue.prototype.$client = Client.create(Vue.prototype.$fireApp, 'https://mypersona.tk/api')
 
     Vue.prototype.$currentID = 0
 

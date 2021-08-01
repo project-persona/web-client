@@ -20,7 +20,7 @@
             <v-list-item-subtitle v-text="persona.email" />
           </v-list-item-content>
           <v-list-item-action class="mr-2">
-            <v-btn icon @click.stop="editPersona(persona._id)">
+            <v-btn icon @click.stop="onEditFormOpen(persona._id)">
               <v-icon>
                 mdi-account-edit
               </v-icon>
@@ -249,7 +249,7 @@
                     <v-text-field
                       v-model="info.email"
                       label="Email"
-                      hint="This cannot be changed later!"
+                      hint="This cannot be changed after creation!"
                       dense
                       outlined
                       clearable
@@ -391,9 +391,10 @@ export default {
         this.formOpened = true
       }
     },
-    editPersona (id) {
+    onEditFormOpen (id) {
       this.forCreate = false
       this.formOpened = true
+      this.$currentID = id
       const targetPersona = this.personas.find((item) => {
         return item._id === id
       })
@@ -401,6 +402,7 @@ export default {
       this.date = targetPersona.birthday
       this.info = { ...targetPersona }
       this.info.address = { ...targetPersona.address }
+      this.info.email = targetPersona.email.slice(0, -13)
       this.dialog = true
     },
     async deletePersona (id) {
@@ -461,14 +463,31 @@ export default {
       }
     },
     async createPersona () {
+      this.overlay = true
       const newPersona = new Persona(this.info.lastName, this.info.firstName, this.date, this.select, this.info.email + '@mypersona.tk', this.info.address)
       try {
         const res = await this.$client.personas.create(newPersona)
         this.personas.push(res)
       } catch (error) {
+        this.overlay = false
         this.snackbarMsg = error
         this.snackbar = true
       }
+      this.overlay = false
+      this.reset()
+      this.dialog = false
+    },
+    async editPersona () {
+      this.overlay = true
+      const changedPersona = new Persona(this.info.lastName, this.info.firstName, this.date, this.select, '', this.info.address)
+      try {
+        await this.$client.personas.edit(this.$currentID, changedPersona)
+        this.personas = await this.$client.personas.list()
+      } catch (error) {
+        this.snackbarMsg = error
+        this.snackbar = true
+      }
+      this.overlay = false
       this.reset()
       this.dialog = false
     }

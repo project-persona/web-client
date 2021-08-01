@@ -14,6 +14,7 @@
   "dependencies": {
     "@persona/infra": "git+https://github.com/project-persona/infra.git",
     "core-js": "^3.15.1",
+    "faker-nuxt": "^1.0.2",
     "firebase": "^8.7.1",
     "nuxt": "^2.15.7",
     "v-mask": "^2.2.4",

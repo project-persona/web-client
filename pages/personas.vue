@@ -16,7 +16,7 @@
             <v-icon>mdi-account</v-icon>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title v-text="persona.name" />
+            <v-list-item-title v-text="persona.firstName + ' ' + persona.lastName" />
             <v-list-item-subtitle v-text="persona.email" />
           </v-list-item-content>
           <v-list-item-icon>
@@ -213,7 +213,7 @@
                   >
                     <v-text-field
                       v-model="info.address.zipCode"
-                      label="Zip code"
+                      label="Postal Code"
                       dense
                       outlined
                       clearable
@@ -234,7 +234,7 @@
                     />
                   </v-col>
                   <v-col class="email-tail">
-                    <h4>@persona.tk</h4>
+                    <h4>@mypersona.tk</h4>
                   </v-col>
                 </v-row>
                 <v-row dense>
@@ -264,6 +264,29 @@
             </v-form>
           </v-card>
         </v-dialog>
+        <v-snackbar
+          v-model="snackbar"
+          :multi-line="true"
+        >
+          {{ snackbarMsg }}
+
+          <template #action="{ attrs }">
+            <v-btn
+              color="warning"
+              text
+              v-bind="attrs"
+              @click="snackbar = false"
+            >
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar>
+        <v-overlay :value="overlay" :absolute="true">
+          <v-progress-circular
+            indeterminate
+            color="amber"
+          />
+        </v-overlay>
       </v-row>
     </v-col>
   </v-row>
@@ -281,20 +304,10 @@ export default {
   layout: 'dashboard',
   data () {
     return {
-      personas: [
-        {
-          name: 'Lucy',
-          email: 'lucyzhong@sfu.ca'
-        },
-        {
-          name: 'Abby',
-          email: 'abby@sfu.ca'
-        },
-        {
-          name: 'Cole',
-          email: 'cole@sfu.ca'
-        }
-      ],
+      overlay: true,
+      snackbar: false,
+      snackbarMsg: '',
+      personas: [],
       info: {
         firstName: '',
         lastName: '',
@@ -341,6 +354,10 @@ export default {
       val && setTimeout(() => (this.activePicker = 'YEAR'))
     }
   },
+  async created () {
+    this.personas = await this.$client.personas.list()
+    this.overlay = false
+  },
   methods: {
     // async getPersonaList () {
     //   await this.$client.personas.list()
@@ -355,30 +372,49 @@ export default {
       this.$refs.form.reset()
     },
     autoForm () {
-      for (const item in this.info) {
-        if (this.info[item] === this.info.address) {
-          for (const addr in this.info.address) {
-            if (!this.info.address[addr]) {
-              this.info.address[addr] = 'Filled'
-            }
-          }
-        }
-        if (!this.info[item]) {
-          this.info[item] = 'Filled'
-        }
+      if (!this.info.firstName) {
+        this.info.firstName = this.$faker.name.firstName()
+      }
+      if (!this.info.lastName) {
+        this.info.lastName = this.$faker.name.lastName()
+      }
+      if (!this.info.address.line1) {
+        this.info.address.line1 = this.$faker.address.streetAddress()
+      }
+      if (!this.info.address.line2) {
+        this.info.address.line2 = this.$faker.address.secondaryAddress()
+      }
+      if (!this.info.address.state) {
+        this.info.address.state = this.$faker.address.state()
+      }
+      if (!this.info.address.zipCode) {
+        this.info.address.zipCode = this.$faker.address.zipCode()
+      }
+      if (!this.info.address.city) {
+        this.info.address.city = this.$faker.address.city()
+      }
+      if (!this.info.address.country) {
+        this.info.address.country = 'Canada'
+      }
+      if (!this.info.email) {
+        this.info.email = this.$faker.lorem.word() + this.$faker.lorem.word()
       }
       if (!this.select) {
-        this.select = this.gender[0]
+        this.select = this.gender[Math.floor(Math.random() * 3)]
       }
       if (!this.date) {
-        this.date = new Date(Date.now()).toISOString().substr(0, 10)
+        this.date = this.$faker.date.between(new Date(1950, 0, 0, 0, 0, 0, 0), new Date(2000, 0, 0, 0, 0, 0, 0)).toISOString().substr(0, 10)
       }
     },
     async createPersona () {
-      const newPersona = new Persona(this.info.lastName, this.info.firstName, this.date, this.select, this.info.email, this.info.address)
-      this.personas.push(newPersona)
-      const res = await this.$client.personas.create(newPersona)
-      console.log(res)
+      const newPersona = new Persona(this.info.lastName, this.info.firstName, this.date, this.select, this.info.email + '@mypersona.tk', this.info.address)
+      try {
+        const res = await this.$client.personas.create(newPersona)
+        this.personas.push(res)
+      } catch (error) {
+        this.snackbarMsg = error
+        this.snackbar = true
+      }
       this.reset()
       this.dialog = false
     }

@@ -10,7 +10,7 @@
           :key="p"
           router
           exact
-          @click="toMailbox"
+          @click="toMailbox(persona._id)"
         >
           <v-list-item-avatar>
             <v-icon>mdi-account</v-icon>
@@ -418,7 +418,8 @@ export default {
       this.snackbarMsg = 'Delete Successfully'
       this.snackbar = true
     },
-    toMailbox () {
+    toMailbox (id) {
+      this.$currentID = id
       this.$router.push('/mailbox')
     },
     save (date) {

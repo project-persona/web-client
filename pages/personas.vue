@@ -10,16 +10,30 @@
           :key="p"
           router
           exact
-          @click="toMailbox"
+          @click="toMailbox(persona._id)"
         >
           <v-list-item-avatar>
             <v-icon>mdi-account</v-icon>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title v-text="persona.name" />
+            <v-list-item-title v-text="persona.firstName + ' ' + persona.lastName" />
             <v-list-item-subtitle v-text="persona.email" />
           </v-list-item-content>
-          <v-list-item-icon>
+          <v-list-item-action class="mr-2">
+            <v-btn icon @click.stop="onEditFormOpen(persona._id)">
+              <v-icon>
+                mdi-account-edit
+              </v-icon>
+            </v-btn>
+          </v-list-item-action>
+          <v-list-item-action>
+            <v-btn icon @click.stop="deletePersona(persona._id)">
+              <v-icon>
+                mdi-delete
+              </v-icon>
+            </v-btn>
+          </v-list-item-action>
+          <v-list-item-icon class="my-auto">
             <v-badge
               :content="mail"
               :value="mail"
@@ -50,6 +64,7 @@
             <v-btn
               v-bind="attrs"
               v-on="on"
+              @click="onCreateFormOpen"
             >
               Create New
             </v-btn>
@@ -66,11 +81,18 @@
               <v-spacer />
               <v-toolbar-items>
                 <v-btn
+                  v-if="forCreate"
                   text
-                  :disabled="isDisable"
                   @click="createPersona"
                 >
                   Create
+                </v-btn>
+                <v-btn
+                  v-else
+                  text
+                  @click="editPersona"
+                >
+                  Save
                 </v-btn>
               </v-toolbar-items>
             </v-toolbar>
@@ -213,7 +235,7 @@
                   >
                     <v-text-field
                       v-model="info.address.zipCode"
-                      label="Zip code"
+                      label="Postal Code"
                       dense
                       outlined
                       clearable
@@ -227,14 +249,14 @@
                     <v-text-field
                       v-model="info.email"
                       label="Email"
-                      hint="This cannot be changed later!"
+                      hint="This cannot be changed after creation!"
                       dense
                       outlined
                       clearable
                     />
                   </v-col>
                   <v-col class="email-tail">
-                    <h4>@persona.tk</h4>
+                    <h4>@mypersona.tk</h4>
                   </v-col>
                 </v-row>
                 <v-row dense>
@@ -264,29 +286,52 @@
             </v-form>
           </v-card>
         </v-dialog>
+        <v-snackbar
+          v-model="snackbar"
+          :multi-line="true"
+        >
+          {{ snackbarMsg }}
+
+          <template #action="{ attrs }">
+            <v-btn
+              color="warning"
+              text
+              v-bind="attrs"
+              @click="snackbar = false"
+            >
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar>
+        <v-overlay :value="overlay" :absolute="true">
+          <v-progress-circular
+            indeterminate
+            color="amber"
+          />
+        </v-overlay>
       </v-row>
     </v-col>
   </v-row>
 </template>
 <script>
+function Persona (lastName, firstName, birthday, gender, email, address) {
+  this.lastName = lastName
+  this.firstName = firstName
+  this.birthday = birthday
+  this.gender = gender
+  this.email = email
+  this.address = address
+}
 export default {
   layout: 'dashboard',
   data () {
     return {
-      personas: [
-        {
-          name: 'Lucy',
-          email: 'lucyzhong@sfu.ca'
-        },
-        {
-          name: 'Abby',
-          email: 'abby@sfu.ca'
-        },
-        {
-          name: 'Cole',
-          email: 'cole@sfu.ca'
-        }
-      ],
+      forCreate: true,
+      formOpened: false,
+      overlay: true,
+      snackbar: false,
+      snackbarMsg: '',
+      personas: [],
       info: {
         firstName: '',
         lastName: '',
@@ -314,15 +359,15 @@ export default {
     }
   },
   computed: {
-    isDisable () {
-      let result = false
-      for (const item in this.info) {
-        if (!this.info[item]) {
-          result = true
-        }
-      }
-      return result
-    }
+    // isDisable () {
+    //   let result = false
+    //   for (const item in this.info) {
+    //     if (!this.info[item]) {
+    //       result = true
+    //     }
+    //   }
+    //   return result
+    // }
     // personas () {
     //   const personas = this.getPersonaList()
     //   return personas
@@ -333,11 +378,48 @@ export default {
       val && setTimeout(() => (this.activePicker = 'YEAR'))
     }
   },
+  async created () {
+    this.personas = await this.$client.personas.list()
+    this.overlay = false
+  },
   methods: {
-    // async getPersonaList () {
-    //   await this.$client.personas.list()
-    // },
-    toMailbox () {
+    onCreateFormOpen () {
+      this.forCreate = true
+      if (this.formOpened) {
+        this.reset()
+      } else {
+        this.formOpened = true
+      }
+    },
+    onEditFormOpen (id) {
+      this.forCreate = false
+      this.formOpened = true
+      this.$currentID = id
+      const targetPersona = this.personas.find((item) => {
+        return item._id === id
+      })
+      this.select = targetPersona.gender
+      this.date = targetPersona.birthday
+      this.info = { ...targetPersona }
+      this.info.address = { ...targetPersona.address }
+      this.info.email = targetPersona.email.slice(0, -13)
+      this.dialog = true
+    },
+    async deletePersona (id) {
+      this.overlay = true
+      try {
+        await this.$client.personas.delete(id)
+        this.personas = await this.$client.personas.list()
+      } catch (error) {
+        this.snackbarMsg = 'An error occurred, please try again'
+        this.snackbar = true
+      }
+      this.overlay = false
+      this.snackbarMsg = 'Delete Successfully'
+      this.snackbar = true
+    },
+    toMailbox (id) {
+      this.$currentID = id
       this.$router.push('/mailbox')
     },
     save (date) {
@@ -347,28 +429,66 @@ export default {
       this.$refs.form.reset()
     },
     autoForm () {
-      for (const item in this.info) {
-        if (this.info[item] === this.info.address) {
-          for (const addr in this.info.address) {
-            if (!this.info.address[addr]) {
-              this.info.address[addr] = 'Filled'
-            }
-          }
-        }
-        if (!this.info[item]) {
-          this.info[item] = 'Filled'
-        }
+      if (!this.info.firstName) {
+        this.info.firstName = this.$faker.name.firstName()
+      }
+      if (!this.info.lastName) {
+        this.info.lastName = this.$faker.name.lastName()
+      }
+      if (!this.info.address.line1) {
+        this.info.address.line1 = this.$faker.address.streetAddress()
+      }
+      if (!this.info.address.line2) {
+        this.info.address.line2 = this.$faker.address.secondaryAddress()
+      }
+      if (!this.info.address.state) {
+        this.info.address.state = this.$faker.address.state()
+      }
+      if (!this.info.address.zipCode) {
+        this.info.address.zipCode = this.$faker.address.zipCode()
+      }
+      if (!this.info.address.city) {
+        this.info.address.city = this.$faker.address.city()
+      }
+      if (!this.info.address.country) {
+        this.info.address.country = 'Canada'
+      }
+      if (!this.info.email) {
+        this.info.email = this.$faker.lorem.word() + this.$faker.lorem.word()
       }
       if (!this.select) {
-        this.select = this.gender[0]
+        this.select = this.gender[Math.floor(Math.random() * 3)]
       }
       if (!this.date) {
-        this.date = new Date(Date.now()).toISOString().substr(0, 10)
+        this.date = this.$faker.date.between(new Date(1950, 0, 0, 0, 0, 0, 0), new Date(2000, 0, 0, 0, 0, 0, 0)).toISOString().substr(0, 10)
       }
     },
-    createPersona () {
-      this.personas.push({ name: this.info.firstName, email: this.info.email + '@persona.tk' })
-      // await this.$client.create(this.info)
+    async createPersona () {
+      this.overlay = true
+      const newPersona = new Persona(this.info.lastName, this.info.firstName, this.date, this.select, this.info.email + '@mypersona.tk', this.info.address)
+      try {
+        const res = await this.$client.personas.create(newPersona)
+        this.personas.push(res)
+      } catch (error) {
+        this.overlay = false
+        this.snackbarMsg = error
+        this.snackbar = true
+      }
+      this.overlay = false
+      this.reset()
+      this.dialog = false
+    },
+    async editPersona () {
+      this.overlay = true
+      const changedPersona = new Persona(this.info.lastName, this.info.firstName, this.date, this.select, '', this.info.address)
+      try {
+        await this.$client.personas.edit(this.$currentID, changedPersona)
+        this.personas = await this.$client.personas.list()
+      } catch (error) {
+        this.snackbarMsg = error
+        this.snackbar = true
+      }
+      this.overlay = false
       this.reset()
       this.dialog = false
     }

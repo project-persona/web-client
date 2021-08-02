@@ -202,7 +202,7 @@ export default {
   },
   async created () {
     console.log('id: ' + this.$currentID.value)
-    this.mailList = await this.$client.emails.list(this.$currentID)
+    this.mailList = await this.$client.emails.list(this.$currentID.value)
     console.log('id: ')
     this.overlay = false
   },

@@ -208,9 +208,9 @@ export default {
     resetEdit (pw) {
       pw.passwordEdit = ''
     },
-    cancel (pw) {
+    cancel () {
       this.dialog = false
-      this.resetAdd(pw)
+      this.resetAdd()
     },
     cancelEdit () {
       this.dialogEdit = false
@@ -222,10 +222,11 @@ export default {
           pwList[i].password = this.passwordEdit
         }
       }
-      // awit
+      // await
     },
     deletePw () {
       //
+      // await
     }
   }
 }

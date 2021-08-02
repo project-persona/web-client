@@ -52,6 +52,89 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
+    <p />
+    <p />
+    <v-row dense justify="center">
+      <v-dialog
+        v-model="dialog"
+        fullscreen
+        hide-overlay
+        transition="dialog-bottom-transition"
+      >
+        <template #activator="{ on, attrs }">
+          <v-btn
+            v-bind="attrs"
+            v-on="on"
+          >
+            Send an Email
+          </v-btn>
+        </template>
+        <v-card>
+          <v-toolbar
+            dark
+          >
+            <v-btn
+              icon
+              dark
+              @click="cancel"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-toolbar-title>Send an Email</v-toolbar-title>
+            <v-spacer />
+            <v-toolbar-items>
+              <v-btn
+                dark
+                text
+                bottom
+                @click="create"
+              >
+                Save
+              </v-btn>
+            </v-toolbar-items>
+          </v-toolbar>
+          <v-form
+            ref="form"
+            lazy-validation
+          >
+            <v-container fluid>
+              <v-row justify="center">
+                <v-col cols="2">
+                  <v-subheader>To:</v-subheader>
+                </v-col>
+                <v-col cols="9">
+                  <v-text-field
+                    label="Email Address"
+                    outlined
+                  />
+                </v-col>
+              </v-row>
+
+              <v-row justify="center">
+                <v-col cols="2">
+                  <v-subheader>Subject:</v-subheader>
+                </v-col>
+                <v-col cols="9">
+                  <v-text-field
+                    label="Subject"
+                    outlined
+                  />
+                </v-col>
+              </v-row>
+
+              <v-row justify="center">
+                <v-col cols="11">
+                  <v-textarea
+                    label="Email Content:"
+                    outlined
+                  />
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-form>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </v-row>
 </template>
 <script>
@@ -67,13 +150,32 @@ export default {
   layout: 'dashboard',
   data () {
     return {
+      dialog: false,
       mailList: [
         { from: [{ address: 'coleeeee@sfu.com', name: 'Abby' }], to: [{ address: 'abbbbby@sfu.com' }], date: d, subject: 'Event today', content: 'There is a wonderful basketball game on the indoor basketball court today' },
         { from: [{ address: 'coleeeee@sfu.com', name: 'Cole' }], to: [{ address: 'abbbbby@sfu.com' }], date: d, subject: 'Good news', content: 'Cheese has dropped in price!' },
         { from: [{ address: 'kennnnn@sfu.com' }], to: [{ address: 'abbbbby@sfu.com' }], date: d, subject: 'Important evet', content: 'Whatever else humans are supposed to eat' }
       ]
     }
+  },
+  methods: {
+    cancel () {
+      this.dialog = false
+      this.reset()
+    },
+    reset () {
+      this.$refs.form.reset()
+    },
+    create () {
+
+    }
   }
+  /*
+  async created () {
+    this.personas = await this.$client.personas.list()
+    this.overlay = false
+  },
+  */
 }
 </script>
 <style>

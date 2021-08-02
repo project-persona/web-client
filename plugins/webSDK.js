@@ -20,7 +20,7 @@ export default {
     // for production
     Vue.prototype.$client = Client.create(Vue.prototype.$fireApp, 'https://mypersona.tk/api')
 
-    Vue.prototype.$currentID = 0
+    Vue.prototype.$currentID = { value: '0' }
 
     Vue.prototype.$accountLogin = async function (email, password) {
       let response

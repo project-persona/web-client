@@ -394,7 +394,7 @@ export default {
     onEditFormOpen (id) {
       this.forCreate = false
       this.formOpened = true
-      this.$currentID = id
+      this.$currentID.value = id
       const targetPersona = this.personas.find((item) => {
         return item._id === id
       })
@@ -419,7 +419,7 @@ export default {
       this.snackbar = true
     },
     toMailbox (id) {
-      this.$currentID = id
+      this.$currentID.value = id
       this.$router.push('/mailbox')
     },
     save (date) {
@@ -482,7 +482,7 @@ export default {
       this.overlay = true
       const changedPersona = new Persona(this.info.lastName, this.info.firstName, this.date, this.select, '', this.info.address)
       try {
-        await this.$client.personas.edit(this.$currentID, changedPersona)
+        await this.$client.personas.edit(this.$currentID.value, changedPersona)
         this.personas = await this.$client.personas.list()
       } catch (error) {
         this.snackbarMsg = error

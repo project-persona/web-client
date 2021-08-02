@@ -40,7 +40,7 @@
               {{ mail.date }}
             </v-col>
             <v-list-item-action>
-              <v-btn icon class="icon" @click.stop="deleteEmail(email._id)">
+              <v-btn icon class="icon" @click.stop="deleteEmail(mail._id)">
                 <v-icon>
                   mdi-delete
                 </v-icon>
@@ -63,26 +63,15 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
+    <v-overlay :value="overlay" :absolute="true">
+      <v-progress-circular
+        indeterminate
+        color="amber"
+      />
+    </v-overlay>
   </v-row>
 </template>
 <script>
-/*
-function getNow () {
-  const today = new Date()
-  const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
-  const time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds()
-  const dateTime = date + ' ' + time
-  return dateTime
-}
-
-function Email (from, to, subject, content) {
-  this.from = from
-  this.to = to
-  this.date = getNow()
-  this.subject = subject
-  this.content = content
-}
-*/
 export default {
   filters: {
     durationFormat (value) {
@@ -100,8 +89,6 @@ export default {
     return {
       dialog: false,
       overlay: true,
-      snackbar: false,
-      snackbarMsg: '',
       mailList: []
     }
   },
@@ -110,25 +97,16 @@ export default {
     this.overlay = false
   },
   methods: {
-    cancel () {
-      this.dialog = false
-      this.reset()
-    },
-    reset () {
-      this.$refs.form.reset()
-    },
-    create () {
-      // const email = new Email()
-    },
-    read (id) {
-      // console.log(id)
-      // await this.$client.emails.show(id)
+    async read (id) {
+      await this.$client.emails.show(id)
+      this.mailList = await this.$client.emails.list(this.$currentID.value)
+      console.log(this.mailList)
     },
     async deleteEmail (id) {
       this.overlay = true
       try {
         await this.$client.emails.delete(id)
-        this.personas = await this.$client.emails.list(this.$currentID.value)
+        this.mailList = await this.$client.emails.list(this.$currentID.value)
       } catch (error) {
         this.snackbarMsg = 'An error occurred, please try again'
         this.snackbar = true

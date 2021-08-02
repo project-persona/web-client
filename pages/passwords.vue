@@ -25,62 +25,13 @@
                   {{ pw.show ? 'mdi-eye' : 'mdi-eye-off' }}
                 </v-icon>
               </v-btn>
-              <v-dialog
-                v-model="dialogEdit"
-                fullscreen
-                hide-overlay
-                transition="dialog-bottom-transition"
+              <v-btn
+                text
+                outlined
+                class="icon"
               >
-                <template #activator="{ on, attrs }">
-                  <v-btn
-                    text
-                    outlined
-                    class="icon"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    Edit
-                  </v-btn>
-                </template>
-                <v-card>
-                  <v-toolbar
-                    dark
-                  >
-                    <v-btn
-                      icon
-                      dark
-                      @click="cancelEdit(pw)"
-                    >
-                      <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                    <v-toolbar-title>Edit password</v-toolbar-title>
-                    <v-spacer />
-                    <v-toolbar-items>
-                      <v-btn
-                        dark
-                        text
-                        bottom
-                        :disabled="disableEdit"
-                        @click="edit(pw)"
-                      >
-                        Save
-                      </v-btn>
-                    </v-toolbar-items>
-                  </v-toolbar>
-                  <v-form
-                    ref="'formEdit'+pw.site"
-                    lazy-validation
-                  >
-                    <h3> {{ pw.site.toUpperCase() }} </h3>
-                    <v-text-field
-                      v-model="passwordEdit"
-                      :rules="[v => !!v || 'Password is required']"
-                      label="Password"
-                      required
-                    />
-                  </v-form>
-                </v-card>
-              </v-dialog>
+                Edit
+              </v-btn>
               <v-btn
                 text
                 outlined
@@ -158,13 +109,6 @@
   </v-row>
 </template>
 <script>
-const pwList = [
-  { site: 'Facebook', password: '123456' },
-  { site: 'Google', password: '2453454' }
-]
-for (let i = 0; i < pwList.length; i++) {
-  pwList[i].show = false
-}
 export default {
   layout: 'dashboard',
   data () {
@@ -172,7 +116,7 @@ export default {
       dialog: false,
       dialogEdit: false,
       passwordEdit: '',
-      pwList,
+      pwList: [],
       pwData: {
         site: '',
         password: ''
@@ -191,13 +135,20 @@ export default {
       } else { return true }
     }
   },
+  async created () {
+    this.pwList = await this.$client.passwords.list(this.$currentID.value)
+    for (let i = 0; i < this.pwList.length; i++) {
+      this.pwList[i].show = false
+    }
+    this.overlay = false
+  },
   methods: {
     create () {
       // await
       this.pwList.push({ site: this.pwData.site, password: this.pwData.password })
       this.dialog = false
-      for (let i = 0; i < pwList.length; i++) {
-        pwList[i].show = false
+      for (let i = 0; i < this.pwList.length; i++) {
+        this.pwList[i].show = false
       }
       this.resetAdd()
       // console.log(pwList)
@@ -217,9 +168,9 @@ export default {
       // this.resetEdit()
     },
     edit (pw) {
-      for (let i = 0; i < pwList.length; i++) {
-        if (pwList[i].site === pw.site) {
-          pwList[i].password = this.passwordEdit
+      for (let i = 0; i < this.pwList.length; i++) {
+        if (this.pwList[i].site === pw.site) {
+          this.pwList[i].password = this.passwordEdit
         }
       }
       // await

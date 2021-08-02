@@ -141,6 +141,29 @@
           </v-form>
         </v-card>
       </v-dialog>
+      <v-snackbar
+        v-model="snackbar"
+        :multi-line="true"
+      >
+        {{ snackbarMsg }}
+
+        <template #action="{ attrs }">
+          <v-btn
+            color="warning"
+            text
+            v-bind="attrs"
+            @click="snackbar = false"
+          >
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
+      <v-overlay :value="overlay" :absolute="true">
+        <v-progress-circular
+          indeterminate
+          color="amber"
+        />
+      </v-overlay>
     </v-row>
   </v-row>
 </template>
@@ -167,12 +190,19 @@ export default {
   data () {
     return {
       dialog: false,
+      overlay: true,
+      snackbar: false,
+      snackbarMsg: '',
       mailList: [
         { from: { address: 'coleeeee@sfu.com', name: 'Abby' }, to: { address: 'abbbbby@sfu.com' }, date: d, subject: 'Event today', content: 'There is a wonderful basketball game on the indoor basketball court today' },
         { from: { address: 'coleeeee@sfu.com', name: 'Cole' }, to: { address: 'abbbbby@sfu.com' }, date: d, subject: 'Good news', content: 'Cheese has dropped in price!' },
         { from: { address: 'kennnnn@sfu.com' }, to: { address: 'abbbbby@sfu.com' }, date: d, subject: 'Important evet', content: 'Whatever else humans are supposed to eat' }
       ]
     }
+  },
+  async created () {
+    this.mailList = await this.$client.emails.list()
+    this.overlay = false
   },
   methods: {
     cancel () {
@@ -185,16 +215,20 @@ export default {
     create () {
       // const email = new Email()
     },
-    deleteEmail (id) {
-      //
+    async deleteEmail (id) {
+      this.overlay = true
+      try {
+        await this.$client.emails.delete(id)
+        this.personas = await this.$client.emails.list()
+      } catch (error) {
+        this.snackbarMsg = 'An error occurred, please try again'
+        this.snackbar = true
+      }
+      this.overlay = false
+      this.snackbarMsg = 'Delete Successfully'
+      this.snackbar = true
     }
   }
-  /*
-  async created () {
-    this.personas = await this.$client.personas.list()
-    this.overlay = false
-  },
-  */
 }
 </script>
 <style>

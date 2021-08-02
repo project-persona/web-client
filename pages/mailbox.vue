@@ -19,8 +19,8 @@
                 size="42px"
                 color="indigo"
               >
-                <span v-if="mail.from[0].name" class="white--text text-h5">
-                  {{ mail.from[0].name[0] + mail.from[0].name[1] }}
+                <span v-if="mail.from.name" class="white--text text-h5">
+                  {{ mail.from.name[0] + mail.from.name[1] }}
                 </span>
                 <v-icon v-else dark>
                   mdi-account-circle
@@ -38,11 +38,18 @@
             >
               {{ mail.date }}
             </v-col>
+            <v-list-item-action>
+              <v-btn icon class="icon" @click.stop="deleteEmail(email._id)">
+                <v-icon>
+                  mdi-delete
+                </v-icon>
+              </v-btn>
+            </v-list-item-action>
           </v-row>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <p>FROM: {{ mail.from[0].address }}</p>
-          <p>TO: {{ mail.to[0].address }}</p>
+          <p>FROM: {{ mail.from.address }}</p>
+          <p>TO: {{ mail.to.address }}</p>
           <p>date: {{ mail.date }}</p>
           <p>subject: {{ mail.subject }}</p>
           <hr>
@@ -145,6 +152,15 @@ function getNow () {
   const dateTime = date + ' ' + time
   return dateTime
 }
+/*
+function Email (from, to, subject, content) {
+  this.from = from
+  this.to = to
+  this.date = getNow()
+  this.subject = subject
+  this.content = content
+}
+*/
 const d = getNow()
 export default {
   layout: 'dashboard',
@@ -152,9 +168,9 @@ export default {
     return {
       dialog: false,
       mailList: [
-        { from: [{ address: 'coleeeee@sfu.com', name: 'Abby' }], to: [{ address: 'abbbbby@sfu.com' }], date: d, subject: 'Event today', content: 'There is a wonderful basketball game on the indoor basketball court today' },
-        { from: [{ address: 'coleeeee@sfu.com', name: 'Cole' }], to: [{ address: 'abbbbby@sfu.com' }], date: d, subject: 'Good news', content: 'Cheese has dropped in price!' },
-        { from: [{ address: 'kennnnn@sfu.com' }], to: [{ address: 'abbbbby@sfu.com' }], date: d, subject: 'Important evet', content: 'Whatever else humans are supposed to eat' }
+        { from: { address: 'coleeeee@sfu.com', name: 'Abby' }, to: { address: 'abbbbby@sfu.com' }, date: d, subject: 'Event today', content: 'There is a wonderful basketball game on the indoor basketball court today' },
+        { from: { address: 'coleeeee@sfu.com', name: 'Cole' }, to: { address: 'abbbbby@sfu.com' }, date: d, subject: 'Good news', content: 'Cheese has dropped in price!' },
+        { from: { address: 'kennnnn@sfu.com' }, to: { address: 'abbbbby@sfu.com' }, date: d, subject: 'Important evet', content: 'Whatever else humans are supposed to eat' }
       ]
     }
   },
@@ -167,7 +183,10 @@ export default {
       this.$refs.form.reset()
     },
     create () {
-
+      // const email = new Email()
+    },
+    deleteEmail (id) {
+      //
     }
   }
   /*
@@ -184,5 +203,9 @@ export default {
   }
   #time {
     float: right;
+  }
+  .icon {
+    float: right;
+    margin-left: 10px;
   }
 </style>

@@ -180,6 +180,7 @@ export default {
     for (let i = 0; i < this.pwList.length; i++) {
       this.pwList[i].show = false
     }
+    console.log(this.pwList)
     this.overlay = false
   },
   methods: {
@@ -188,6 +189,7 @@ export default {
       const newPassword = new Password(this.pwData.site, this.pwData.uri, this.pwData.userName, this.pwData.password)
       try {
         const res = await this.$client.passwords.create(this.$currentID.value, newPassword)
+        res.show = false
         this.pwList.push(res)
       } catch (error) {
         this.overlay = false

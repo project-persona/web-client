@@ -249,8 +249,19 @@ export default {
       this.dialog = false
       this.reset()
     },
-    edit () {
-      // await
+    async edit () {
+      this.overlay = true
+      const changePassword = new Password(this.pwData.site, this.pwData.uri, this.pwData.userName, this.pwData.password)
+      try {
+        await this.$client.passwords.edit(this.currentPass, changePassword)
+        this.pwList = await this.$client.passwords.list(this.$currentID.value)
+      } catch (error) {
+        this.snackbarMsg = error
+        this.snackbar = true
+      }
+      this.overlay = false
+      this.reset()
+      this.dialog = false
     },
     async deletePw (id) {
       this.overlay = true

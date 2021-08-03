@@ -20,8 +20,8 @@
                 size="42px"
                 color="indigo"
               >
-                <span v-if="mail.from.name" class="white--text text-h5">
-                  {{ mail.from.name[0] + mail.from.name[1] }}
+                <span v-if="mail.from[0].name" class="white--text text-h5">
+                  {{ mail.from[0].name[0] + mail.from.name[1] }}
                 </span>
                 <v-icon v-else dark>
                   mdi-account-circle
@@ -63,6 +63,23 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
+    <v-snackbar
+      v-model="snackbar"
+      :multi-line="true"
+    >
+      {{ snackbarMsg }}
+
+      <template #action="{ attrs }">
+        <v-btn
+          color="warning"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
     <v-overlay :value="overlay" :absolute="true">
       <v-progress-circular
         indeterminate

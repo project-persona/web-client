@@ -86,13 +86,25 @@
               </v-toolbar-items>
             </v-toolbar>
             <v-form
-              ref="formAdd"
+              ref="form"
               lazy-validation
             >
               <v-text-field
                 v-model="pwData.site"
                 label="Site"
                 :rules="[v => !!v || 'Site name is required']"
+                required
+              />
+              <v-text-field
+                v-model="pwData.uri"
+                label="URI"
+                :rules="[v => !!v || 'Site URI is required']"
+                required
+              />
+              <v-text-field
+                v-model="pwData.userName"
+                label="User Name"
+                :rules="[v => !!v || 'User name is required']"
                 required
               />
               <v-text-field
@@ -114,11 +126,15 @@ export default {
   data () {
     return {
       dialog: false,
-      dialogEdit: false,
+      overlay: true,
+      snackbar: false,
+      snackbarMsg: '',
       passwordEdit: '',
       pwList: [],
       pwData: {
         site: '',
+        uri: '',
+        userName: '',
         password: ''
       }
     }
@@ -126,11 +142,6 @@ export default {
   computed: {
     disable () {
       if (this.pwData.site !== '' && this.pwData.password !== '') {
-        return false
-      } else { return true }
-    },
-    disableEdit () {
-      if (this.password !== '') {
         return false
       } else { return true }
     }
@@ -153,19 +164,12 @@ export default {
       this.resetAdd()
       // console.log(pwList)
     },
-    resetAdd () {
-      this.$refs.formAdd.reset()
-    },
-    resetEdit (pw) {
-      pw.passwordEdit = ''
+    reset () {
+      this.$refs.form.reset()
     },
     cancel () {
       this.dialog = false
-      this.resetAdd()
-    },
-    cancelEdit () {
-      this.dialogEdit = false
-      // this.resetEdit()
+      this.reset()
     },
     edit (pw) {
       for (let i = 0; i < this.pwList.length; i++) {
@@ -175,9 +179,18 @@ export default {
       }
       // await
     },
-    deletePw () {
-      //
-      // await
+    async deletePw (id) {
+      this.overlay = true
+      try {
+        await this.$client.passwords.delete(id)
+        this.mailList = await this.$client.passwords.list(this.$currentID.value)
+      } catch (error) {
+        this.snackbarMsg = 'An error occurred, please try again'
+        this.snackbar = true
+      }
+      this.overlay = false
+      this.snackbarMsg = 'Delete Successfully'
+      this.snackbar = true
     }
   }
 }

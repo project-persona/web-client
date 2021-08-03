@@ -119,7 +119,6 @@ export default {
     async read (id) {
       await this.$client.emails.show(id)
       this.mailList = await this.$client.emails.list(this.$currentID.value)
-      console.log(this.mailList)
     },
     async deleteEmail (id) {
       this.overlay = true

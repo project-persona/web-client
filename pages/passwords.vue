@@ -57,6 +57,7 @@
             <v-btn
               v-bind="attrs"
               v-on="on"
+              @click="createOn"
             >
               Add a new passeord
             </v-btn>
@@ -161,7 +162,6 @@ function Password (site, uri, userName, password) {
   this.uri = uri
   this.username = userName
   this.password = password
-  this.currentPass = ''
 }
 export default {
   layout: 'dashboard',
@@ -171,6 +171,7 @@ export default {
       overlay: true,
       snackbar: false,
       snackbarMsg: '',
+      currentPass: '',
       pwList: [],
       pwData: {
         site: '',
@@ -220,6 +221,9 @@ export default {
       this.reset()
     },
     editOn (id) {
+
+    },
+    createOn () {
 
     },
     edit () {

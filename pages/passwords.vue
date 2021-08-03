@@ -204,7 +204,6 @@ export default {
     for (let i = 0; i < this.pwList.length; i++) {
       this.pwList[i].show = false
     }
-    console.log(this.pwList)
     this.overlay = false
   },
   methods: {
@@ -219,7 +218,6 @@ export default {
       const targetPass = this.pwList.find((item) => {
         return item._id === id
       })
-      console.log(targetPass)
       this.pwData.site = targetPass.name
       this.pwData.userName = targetPass.username
       this.pwData.uri = targetPass.uri

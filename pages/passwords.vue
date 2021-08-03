@@ -219,10 +219,11 @@ export default {
       const targetPass = this.pwList.find((item) => {
         return item._id === id
       })
-      this.pwList.site = targetPass.name
-      this.pwList.userName = targetPass.username
-      this.pwList.uri = targetPass.uri
-      this.pwList.password = targetPass.password
+      console.log(targetPass)
+      this.pwData.site = targetPass.name
+      this.pwData.userName = targetPass.username
+      this.pwData.uri = targetPass.uri
+      this.pwData.password = targetPass.password
       this.dialog = true
     },
     async create () {

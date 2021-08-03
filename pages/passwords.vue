@@ -59,7 +59,7 @@
               v-on="on"
               @click="createOn"
             >
-              Add a new passeord
+              Add a new password
             </v-btn>
           </template>
           <v-card>
@@ -73,7 +73,16 @@
               >
                 <v-icon>mdi-close</v-icon>
               </v-btn>
-              <v-toolbar-title>Add a new password</v-toolbar-title>
+              <v-toolbar-title
+                v-if="forCreate"
+              >
+                Add a new password
+              </v-toolbar-title>
+              <v-toolbar-title
+                v-else
+              >
+                Edit the Password
+              </v-toolbar-title>
               <v-spacer />
               <v-toolbar-items>
                 <v-btn
@@ -87,7 +96,7 @@
                   Create
                 </v-btn>
                 <v-btn
-                  v-if="forEdit"
+                  v-else
                   dark
                   text
                   bottom
@@ -167,6 +176,8 @@ export default {
   layout: 'dashboard',
   data () {
     return {
+      forCreate: true,
+      forEdit: false,
       dialog: false,
       overlay: true,
       snackbar: false,
@@ -183,7 +194,7 @@ export default {
   },
   computed: {
     disable () {
-      if (this.pwData.site !== '' && this.pwData.password !== '') {
+      if (this.pwData.site !== '' && this.pwData.password !== '' && this.pwData.uri !== '' && this.pwData.userName !== '') {
         return false
       } else { return true }
     }
@@ -197,6 +208,23 @@ export default {
     this.overlay = false
   },
   methods: {
+    createOn () {
+      this.forCreate = true
+      this.forEdit = false
+    },
+    editOn (id) {
+      this.forCreate = false
+      this.forEdit = true
+      this.currentPass = id
+      const targetPass = this.pwList.find((item) => {
+        return item._id === id
+      })
+      this.pwList.site = targetPass.name
+      this.pwList.userName = targetPass.username
+      this.pwList.uri = targetPass.uri
+      this.pwList.password = targetPass.password
+      this.dialog = true
+    },
     async create () {
       this.overlay = true
       const newPassword = new Password(this.pwData.site, this.pwData.uri, this.pwData.userName, this.pwData.password)
@@ -219,12 +247,6 @@ export default {
     cancel () {
       this.dialog = false
       this.reset()
-    },
-    editOn (id) {
-
-    },
-    createOn () {
-
     },
     edit () {
       // await

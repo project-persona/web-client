@@ -28,16 +28,13 @@
                 </v-icon>
               </v-avatar>
             </v-col>
-            <v-col
-              cols="9"
-            >
+            <v-col>
               <strong>{{ mail.subject }}</strong>
             </v-col>
             <v-col
-              id="time"
-              class="grey--text text-truncate hidden-sm-and-down"
+              class="grey--text text-truncate"
             >
-              {{ mail.date }}
+              {{ mail.date | durationFormat }}
             </v-col>
             <v-list-item-action>
               <v-btn icon class="icon" @click.stop="deleteEmail(mail._id)">

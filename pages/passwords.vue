@@ -29,7 +29,7 @@
                 text
                 outlined
                 class="icon"
-                @click="edit(pw._id)"
+                @click="editOn(pw._id)"
               >
                 Edit
               </v-btn>
@@ -76,11 +76,22 @@
               <v-spacer />
               <v-toolbar-items>
                 <v-btn
+                  v-if="forCreate"
                   dark
                   text
                   bottom
                   :disabled="disable"
                   @click="create"
+                >
+                  Create
+                </v-btn>
+                <v-btn
+                  v-if="forEdit"
+                  dark
+                  text
+                  bottom
+                  :disabled="disable"
+                  @click="edit"
                 >
                   Save
                 </v-btn>
@@ -150,6 +161,7 @@ function Password (site, uri, userName, password) {
   this.uri = uri
   this.username = userName
   this.password = password
+  this.currentPass = ''
 }
 export default {
   layout: 'dashboard',
@@ -207,7 +219,10 @@ export default {
       this.dialog = false
       this.reset()
     },
-    edit (id) {
+    editOn (id) {
+
+    },
+    edit () {
       // await
     },
     async deletePw (id) {

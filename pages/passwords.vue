@@ -15,7 +15,7 @@
         </thead>
         <tbody>
           <tr v-for="pw in pwList" :key="pw.site" align="center">
-            <td>{{ pw.site.toUpperCase() }}</td>
+            <td>{{ pw.name.toUpperCase() }}</td>
             <td class="text-center">
               {{ pw.show ? pw.password : '#######' }}
             </td>
@@ -29,6 +29,7 @@
                 text
                 outlined
                 class="icon"
+                @click="edit(pw._id)"
               >
                 Edit
               </v-btn>
@@ -36,7 +37,7 @@
                 text
                 outlined
                 class="icon"
-                @click="deletePw"
+                @click="deletePw(pw._id)"
               >
                 Delete
               </v-btn>
@@ -116,11 +117,40 @@
             </v-form>
           </v-card>
         </v-dialog>
+        <v-snackbar
+          v-model="snackbar"
+          :multi-line="true"
+        >
+          {{ snackbarMsg }}
+
+          <template #action="{ attrs }">
+            <v-btn
+              color="warning"
+              text
+              v-bind="attrs"
+              @click="snackbar = false"
+            >
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar>
+        <v-overlay :value="overlay" :absolute="true">
+          <v-progress-circular
+            indeterminate
+            color="amber"
+          />
+        </v-overlay>
       </v-row>
     </v-col>
   </v-row>
 </template>
 <script>
+function Password (site, uri, userName, password) {
+  this.name = site
+  this.uri = uri
+  this.username = userName
+  this.password = password
+}
 export default {
   layout: 'dashboard',
   data () {
@@ -129,7 +159,6 @@ export default {
       overlay: true,
       snackbar: false,
       snackbarMsg: '',
-      passwordEdit: '',
       pwList: [],
       pwData: {
         site: '',
@@ -154,15 +183,20 @@ export default {
     this.overlay = false
   },
   methods: {
-    create () {
-      // await
-      this.pwList.push({ site: this.pwData.site, password: this.pwData.password })
-      this.dialog = false
-      for (let i = 0; i < this.pwList.length; i++) {
-        this.pwList[i].show = false
+    async create () {
+      this.overlay = true
+      const newPassword = new Password(this.pwData.site, this.pwData.uri, this.pwData.userName, this.pwData.password)
+      try {
+        const res = await this.$client.passwords.create(this.$currentID.value, newPassword)
+        this.pwList.push(res)
+      } catch (error) {
+        this.overlay = false
+        this.snackbarMsg = error
+        this.snackbar = true
       }
-      this.resetAdd()
-      // console.log(pwList)
+      this.overlay = false
+      this.reset()
+      this.dialog = false
     },
     reset () {
       this.$refs.form.reset()
@@ -171,19 +205,14 @@ export default {
       this.dialog = false
       this.reset()
     },
-    edit (pw) {
-      for (let i = 0; i < this.pwList.length; i++) {
-        if (this.pwList[i].site === pw.site) {
-          this.pwList[i].password = this.passwordEdit
-        }
-      }
+    edit (id) {
       // await
     },
     async deletePw (id) {
       this.overlay = true
       try {
         await this.$client.passwords.delete(id)
-        this.mailList = await this.$client.passwords.list(this.$currentID.value)
+        this.pwList = await this.$client.passwords.list(this.$currentID.value)
       } catch (error) {
         this.snackbarMsg = 'An error occurred, please try again'
         this.snackbar = true

@@ -21,7 +21,7 @@
                 color="indigo"
               >
                 <span v-if="mail.from[0].name" class="white--text text-h5">
-                  {{ mail.from[0].name[0] + mail.from.name[1] }}
+                  {{ mail.from[0].name[0] + mail.from[0].name[1] }}
                 </span>
                 <v-icon v-else dark>
                   mdi-account-circle
@@ -106,6 +106,8 @@ export default {
     return {
       dialog: false,
       overlay: true,
+      snackbar: false,
+      snackbarMsg: '',
       mailList: []
     }
   },

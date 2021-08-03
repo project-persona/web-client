@@ -7,7 +7,7 @@ ADD ./ /app
 RUN cd /app \
     && npm install \
     && npm run generate \
-    apk del git
+    && apk del git
 
 WORKDIR /app
 

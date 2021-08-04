@@ -2,7 +2,7 @@
   <v-row justify="center" align="center" class="my-auto">
     <v-col cols="12" sm="8" md="6">
       <v-card class="py-4 d-flex justify-center" color="rgb(255, 0, 0, 0)">
-        <Logo-no-bg />
+        <Logo-no-bg/>
       </v-card>
       <v-card class="mx-auto mt-3" color="rgb(255, 0, 0, 0)">
         <v-form
@@ -52,7 +52,7 @@
           </v-container>
         </v-form>
         <v-card-actions>
-          <v-spacer />
+          <v-spacer/>
           <v-btn
             color="accent"
             @click="clear"
@@ -111,17 +111,18 @@ export default {
       this.pwd = ''
       this.confirmPwd = ''
     },
-    async submit () {
+    submit () {
       this.valid = this.$refs.form.validate()
-      if (this.valid) {
-        const res = await this.$accountSignup(this.email, this.pwd)
-        if (res.success) {
-          this.$router.push({ path: '/personas' })
-        } else {
-          this.snackbarMsg = res.msg
-          this.snackbar = true
-        }
+      if (!this.valid) {
+        return
       }
+
+      this.$fireApp.auth().createUserWithEmailAndPassword(this.email, this.pwd)
+        .then(credential => this.$router.push({ path: '/personas' }))
+        .catch((error) => {
+          this.snackbarMsg = error.message
+          this.snackbar = true
+        })
     }
   }
 }

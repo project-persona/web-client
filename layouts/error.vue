@@ -5,10 +5,19 @@
     </h1>
     <h1 v-else>
       {{ otherError }}
+      <p class="error-message">
+        {{ error.message }}
+      </p>
     </h1>
     <NuxtLink to="/">
       Home page
     </NuxtLink>
+    <a @click.stop="$router.go(0)">
+      Refresh
+    </a>
+    <a @click.stop="clearSession(); $router.push('/')">
+      Sign In
+    </a>
   </v-app>
 </template>
 
@@ -24,7 +33,7 @@ export default {
   data () {
     return {
       pageNotFound: '404 Not Found',
-      otherError: 'An error occurred'
+      otherError: 'An error has occurred'
     }
   },
   head () {
@@ -33,6 +42,11 @@ export default {
     return {
       title
     }
+  },
+  methods: {
+    clearSession () {
+      window.sessionStorage.clear()
+    }
   }
 }
 </script>
@@ -40,5 +54,10 @@ export default {
 <style scoped>
 h1 {
   font-size: 20px;
+}
+
+.error-message {
+  font-size: 16px;
+  font-weight: normal;
 }
 </style>

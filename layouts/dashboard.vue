@@ -21,7 +21,7 @@
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
+            <v-list-item-title v-text="item.title"/>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -31,10 +31,10 @@
       fixed
       app
     >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title v-text="username" />
-      <v-spacer />
-      <v-btn class="mr-4" icon>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"/>
+      <v-toolbar-title v-text="username"/>
+      <v-spacer/>
+      <v-btn class="mr-4" icon @click.stop="logout()">
         <v-icon class="mx-1">
           mdi-logout-variant
         </v-icon>
@@ -43,7 +43,7 @@
     </v-app-bar>
     <v-main>
       <v-container>
-        <Nuxt />
+        <Nuxt/>
       </v-container>
     </v-main>
     <v-footer
@@ -96,6 +96,14 @@ export default {
   methods: {
     setPage (item) {
       this.pageName = item.title
+    },
+    logout () {
+      this.$fireApp.auth().signOut()
+        .catch(error => alert(error.message))
+        .finally(() => {
+          this.$currentID.value = ''
+          this.$router.push('/')
+        })
     }
   }
 }

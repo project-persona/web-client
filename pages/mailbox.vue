@@ -99,7 +99,6 @@ export default {
     }
   },
   layout: 'dashboard',
-  middleware: 'authenticated',
   data () {
     return {
       dialog: false,
@@ -112,6 +111,11 @@ export default {
   async created () {
     if (!await this.$fireApp.ensureLoggedIn()) {
       return await this.$router.push('/')
+    }
+
+    if (!this.$currentID.value) {
+      alert('Select a persona first')
+      return await this.$router.push('/personas')
     }
 
     this.mailList = await this.$client.emails.list(this.$currentID.value)

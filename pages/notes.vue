@@ -7,7 +7,6 @@
 </template>
 <script>
 export default {
-  layout: 'dashboard',
-  middleware: 'authenticated'
+  layout: 'dashboard'
 }
 </script>

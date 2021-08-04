@@ -5,6 +5,7 @@
     </h1>
     <h1 v-else>
       {{ otherError }}
+      <p class="error-message">{{ error.message }}</p>
     </h1>
     <NuxtLink to="/">
       Home page
@@ -24,7 +25,7 @@ export default {
   data () {
     return {
       pageNotFound: '404 Not Found',
-      otherError: 'An error occurred'
+      otherError: 'An error has occurred'
     }
   },
   head () {
@@ -40,5 +41,10 @@ export default {
 <style scoped>
 h1 {
   font-size: 20px;
+}
+
+.error-message {
+  font-size: 16px;
+  font-weight: normal;
 }
 </style>

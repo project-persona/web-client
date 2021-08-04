@@ -60,8 +60,7 @@
           <v-btn
             color="secondary"
             class="mx-auto"
-            nuxt
-            to="/"
+            @click.stop="loginWithGoogle"
           >
             Continue using
             <v-icon class="ml-1">
@@ -91,6 +90,8 @@
   </v-row>
 </template>
 <script>
+import firebase from 'firebase'
+
 export default {
   layout: 'default',
   data () {
@@ -117,6 +118,14 @@ export default {
       }
 
       this.$fireApp.auth().signInWithEmailAndPassword(this.email, this.pwd)
+        .then(credential => this.$router.push({ path: '/personas' }))
+        .catch((error) => {
+          this.snackbarMsg = error.message
+          this.snackbar = true
+        })
+    },
+    loginWithGoogle () {
+      this.$fireApp.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())
         .then(credential => this.$router.push({ path: '/personas' }))
         .catch((error) => {
           this.snackbarMsg = error.message

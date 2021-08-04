@@ -174,7 +174,6 @@ function Password (site, uri, userName, password) {
 }
 export default {
   layout: 'dashboard',
-  middleware: 'authenticated',
   data () {
     return {
       forCreate: true,
@@ -203,6 +202,11 @@ export default {
   async created () {
     if (!await this.$fireApp.ensureLoggedIn()) {
       return await this.$router.push('/')
+    }
+
+    if (!this.$currentID.value) {
+      alert('Select a persona first')
+      return await this.$router.push('/personas')
     }
 
     this.pwList = await this.$client.passwords.list(this.$currentID.value)

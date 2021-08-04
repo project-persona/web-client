@@ -2,7 +2,7 @@
   <v-row justify="center" align="center" class="my-auto">
     <v-col cols="12" sm="8" md="6">
       <v-card class="py-4 d-flex justify-center" color="rgb(255, 0, 0, 0)">
-        <Logo-no-bg />
+        <Logo-no-bg/>
       </v-card>
       <v-card style="max-width:70%" class="mx-auto mt-3" color="rgb(255, 0, 0, 0)">
         <v-form
@@ -38,7 +38,7 @@
           </v-container>
         </v-form>
         <v-card-actions>
-          <v-spacer />
+          <v-spacer/>
           <v-btn
             color="accent"
             nuxt
@@ -110,32 +110,33 @@ export default {
       this.email = ''
       this.pwd = ''
     },
-    async submit () {
+    submit () {
       this.valid = this.$refs.form.validate()
-      if (this.valid) {
-        const res = await this.$accountLogin(this.email, this.pwd)
-        if (res.success) {
-          this.$router.push({ path: '/personas' })
-        } else {
-          this.snackbarMsg = res.msg
-          this.snackbar = true
-        }
+      if (!this.valid) {
+        return
       }
+
+      this.$fireApp.auth().signInWithEmailAndPassword(this.email, this.pwd)
+        .then(credential => this.$router.push({ path: '/personas' }))
+        .catch((error) => {
+          this.snackbarMsg = error.message
+          this.snackbar = true
+        })
     }
   }
 }
 </script>
 <style scoped>
 .seperate {
-   width: 100%;
-   text-align: center;
-   border-bottom: 1px solid #FFF;
-   line-height: 0.1em;
-   margin: 10px 0 20px;
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid #FFF;
+  line-height: 0.1em;
+  margin: 10px 0 20px;
 }
 
 .seperate span {
-    background:#000;
-    padding:0 10px;
+  background: #000;
+  padding: 0 10px;
 }
 </style>

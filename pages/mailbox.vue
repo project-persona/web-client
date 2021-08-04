@@ -56,7 +56,7 @@
           <p>date: {{ mail.date | durationFormat }}</p>
           <p>subject: {{ mail.subject }}</p>
           <hr>
-          <div class="content" v-html="mail.content" />
+          <div class="content" v-html="mail.content"/>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -99,6 +99,7 @@ export default {
     }
   },
   layout: 'dashboard',
+  middleware: 'authenticated',
   data () {
     return {
       dialog: false,
@@ -109,6 +110,10 @@ export default {
     }
   },
   async created () {
+    if (!await this.$fireApp.ensureLoggedIn()) {
+      return await this.$router.push('/')
+    }
+
     this.mailList = await this.$client.emails.list(this.$currentID.value)
     this.overlay = false
   },
@@ -134,14 +139,16 @@ export default {
 }
 </script>
 <style>
-  .content {
-    margin: 30px;
-  }
-  #time {
-    float: right;
-  }
-  .icon {
-    float: right;
-    margin-left: 10px;
-  }
+.content {
+  margin: 30px;
+}
+
+#time {
+  float: right;
+}
+
+.icon {
+  float: right;
+  margin-left: 10px;
+}
 </style>

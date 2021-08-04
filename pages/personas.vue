@@ -16,8 +16,8 @@
             <v-icon>mdi-account</v-icon>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title v-text="persona.firstName + ' ' + persona.lastName" />
-            <v-list-item-subtitle v-text="persona.email" />
+            <v-list-item-title v-text="persona.firstName + ' ' + persona.lastName"/>
+            <v-list-item-subtitle v-text="persona.email"/>
           </v-list-item-content>
           <v-list-item-action class="mr-2">
             <v-btn icon @click.stop="onEditFormOpen(persona._id)">
@@ -78,7 +78,7 @@
                 <v-icon>mdi-close</v-icon>
               </v-btn>
               <v-toolbar-title>Persona information</v-toolbar-title>
-              <v-spacer />
+              <v-spacer/>
               <v-toolbar-items>
                 <v-btn
                   v-if="forCreate"
@@ -322,6 +322,7 @@ function Persona (lastName, firstName, birthday, gender, email, address) {
   this.email = email
   this.address = address
 }
+
 export default {
   layout: 'dashboard',
   data () {
@@ -379,6 +380,9 @@ export default {
     }
   },
   async created () {
+    if (!await this.$fireApp.ensureLoggedIn()) {
+      return await this.$router.push('/')
+    }
     this.personas = await this.$client.personas.list()
     this.overlay = false
   },
@@ -500,15 +504,18 @@ export default {
   font-size: 3rem;
   font-weight: bold;
 }
+
 .bottom-text {
   text-align: center;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
+
 .form {
   padding-top: 3rem;
   padding-bottom: 3rem;
 }
+
 .email-tail {
   align-self: center;
   padding-bottom: 2rem;

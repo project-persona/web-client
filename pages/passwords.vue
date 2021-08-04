@@ -174,6 +174,7 @@ function Password (site, uri, userName, password) {
 }
 export default {
   layout: 'dashboard',
+  middleware: 'authenticated',
   data () {
     return {
       forCreate: true,
@@ -200,6 +201,10 @@ export default {
     }
   },
   async created () {
+    if (!await this.$fireApp.ensureLoggedIn()) {
+      return await this.$router.push('/')
+    }
+
     this.pwList = await this.$client.passwords.list(this.$currentID.value)
     for (let i = 0; i < this.pwList.length; i++) {
       this.pwList[i].show = false

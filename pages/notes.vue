@@ -39,6 +39,14 @@
               <v-spacer />
               <v-btn
                 icon
+                @click="editNote(note._id)"
+              >
+                <v-icon>
+                  mdi-file-edit
+                </v-icon>
+              </v-btn>
+              <v-btn
+                icon
                 @click="deleteNote(note._id)"
               >
                 <v-icon>
@@ -49,6 +57,41 @@
           </v-card>
         </v-col>
       </v-row>
+      <v-dialog
+        v-model="dialog"
+        width="1000"
+      >
+        <v-card>
+          <v-card-title>
+            Edit Note
+          </v-card-title>
+
+          <v-text-field
+            v-model="titleToEdit"
+            label="Title"
+            class="mx-3"
+          />
+          <v-textarea
+            v-model="contentToEdit"
+            solo
+            name="noteInput"
+            label="Take a note"
+          />
+
+          <v-divider />
+
+          <v-card-actions>
+            <v-spacer />
+            <v-btn
+              color="primary"
+              text
+              @click="onEditFormSubmit"
+            >
+              Save
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
     <v-snackbar
       v-model="snackbar"
@@ -85,7 +128,11 @@ export default {
       toSaved: '',
       titleToSaved: '',
       snackbar: false,
-      snackbarMsg: ''
+      snackbarMsg: '',
+      dialog: false,
+      titleToEdit: '',
+      contentToEdit: '',
+      currentNoteID: ''
     }
   },
   async created () {
@@ -119,6 +166,30 @@ export default {
         this.snackbarMsg = error
         this.snackbar = true
       }
+      this.overlay = false
+    },
+    editNote (id) {
+      const targetNote = this.notes.find((item) => {
+        return item._id === id
+      })
+      this.titleToEdit = targetNote.title
+      this.contentToEdit = targetNote.content
+      this.currentNoteID = targetNote._id
+      this.dialog = true
+    },
+    async onEditFormSubmit () {
+      this.overlay = true
+      try {
+        await this.$client.notes.edit(this.currentNoteID, { title: this.titleToEdit, content: this.contentToEdit })
+        this.notes = await this.$client.notes.list(this.$currentID.value)
+        this.snackbarMsg = 'Success!'
+        this.snackbar = true
+      } catch (error) {
+        this.overlay = false
+        this.snackbarMsg = error
+        this.snackbar = true
+      }
+      this.dialog = false
       this.overlay = false
     }
   }

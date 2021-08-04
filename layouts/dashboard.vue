@@ -100,7 +100,10 @@ export default {
     logout () {
       this.$fireApp.auth().signOut()
         .catch(error => alert(error.message))
-        .finally(() => this.$router.push('/'))
+        .finally(() => {
+          this.$currentID.value = ''
+          this.$router.push('/')
+        })
     }
   }
 }

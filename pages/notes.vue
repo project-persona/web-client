@@ -136,6 +136,15 @@ export default {
     }
   },
   async created () {
+    if (!await this.$fireApp.ensureLoggedIn()) {
+      return await this.$router.push('/')
+    }
+
+    if (!this.$currentID.value) {
+      alert('Select a persona first')
+      return await this.$router.push('/personas')
+    }
+
     this.notes = await this.$client.notes.list(this.$currentID.value)
     this.overlay = false
   },

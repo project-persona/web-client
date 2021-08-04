@@ -35,6 +35,17 @@
           <v-card>
             <v-card-title v-text="note.title" />
             <v-card-text v-text="note.content" />
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                icon
+                @click="deleteNote(note._id)"
+              >
+                <v-icon>
+                  mdi-delete
+                </v-icon>
+              </v-btn>
+            </v-card-actions>
           </v-card>
         </v-col>
       </v-row>
@@ -88,6 +99,20 @@ export default {
         await this.$client.notes.create(this.$currentID.value, { title: this.titleToSaved, content: this.toSaved })
         this.notes = await this.$client.notes.list(this.$currentID.value)
         this.snackbarMsg = 'Success!'
+        this.snackbar = true
+      } catch (error) {
+        this.overlay = false
+        this.snackbarMsg = error
+        this.snackbar = true
+      }
+      this.overlay = false
+    },
+    async deleteNote (id) {
+      this.overlay = true
+      try {
+        await this.$client.notes.delete(id)
+        this.notes = await this.$client.notes.list(this.$currentID.value)
+        this.snackbarMsg = 'Deleted'
         this.snackbar = true
       } catch (error) {
         this.overlay = false

@@ -51,12 +51,22 @@
           </v-row>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <p>FROM: {{ mail.from[0].address }}</p>
-          <p>TO: {{ mail.to[0].address }}</p>
-          <p>date: {{ mail.date | durationFormat }}</p>
-          <p>subject: {{ mail.subject }}</p>
+          <p><strong>From: </strong> {{
+              mail.from.map(({
+                address,
+                name
+              }) => name ? `${name} &lt;${address}&gt;` : address).join(', ')
+            }}</p>
+          <p><strong>To: </strong>{{
+              mail.to.map(({
+                address,
+                name
+              }) => name ? `${name} &lt;${address}&gt;` : address).join(', ')
+            }}</p>
+          <p><strong>Date: </strong>{{ mail.date | durationFormat }}</p>
+          <p><strong>Subject: </strong>{{ mail.subject }}</p>
           <hr>
-          <div class="content" v-html="mail.content"/>
+          <iframe :srcdoc="mail.content" sandbox width="100%" style="height: 500px; background: white"></iframe>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -105,7 +115,8 @@ export default {
       overlay: true,
       snackbar: false,
       snackbarMsg: '',
-      mailList: []
+      mailList: [],
+      timeoutHandler: 0
     }
   },
   async created () {
@@ -120,11 +131,29 @@ export default {
 
     this.mailList = await this.$client.emails.list(this.$currentID.value)
     this.overlay = false
+
+    const refresh = () => {
+      this.timeoutHandler = setTimeout(() => {
+        this.$client.emails.list(this.$currentID.value)
+          .then((emails) => {
+            this.mailList = emails
+          })
+          .finally(() => refresh())
+      }, 5000)
+    }
+
+    refresh()
+  },
+  destroyed () {
+    clearTimeout(this.timeoutHandler)
   },
   methods: {
     async read (id) {
-      await this.$client.emails.show(id)
-      this.mailList = await this.$client.emails.list(this.$currentID.value)
+      const email = this.mailList.find(email => email._id === id && !email.read)
+      if (email) {
+        await this.$client.emails.show(id)
+        email.read = true
+      }
     },
     async deleteEmail (id) {
       this.overlay = true

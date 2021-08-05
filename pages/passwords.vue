@@ -246,7 +246,7 @@ export default {
         this.pwList.push(res)
       } catch (error) {
         this.overlay = false
-        this.snackbarMsg = error
+        this.snackbarMsg = error.message
         this.snackbar = true
       }
       this.overlay = false
@@ -266,7 +266,7 @@ export default {
         const res = await this.$client.passwords.edit(this.currentPass, this.pwData)
         this.pwList = this.pwList.map(pw => pw._id === res._id ? res : pw)
       } catch (error) {
-        this.snackbarMsg = error
+        this.snackbarMsg = error.message
         this.snackbar = true
       }
       this.overlay = false
@@ -279,7 +279,7 @@ export default {
         await this.$client.passwords.delete(id)
         this.pwList = this.pwList.filter(pw => pw._id !== id)
       } catch (error) {
-        this.snackbarMsg = 'An error occurred, please try again'
+        this.snackbarMsg = error.message
         this.snackbar = true
       }
       this.overlay = false

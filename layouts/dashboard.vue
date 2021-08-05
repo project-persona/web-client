@@ -85,15 +85,36 @@ export default {
         }
       ],
       miniVariant: true,
-      pageName: 'Home'
+      pageName: 'Home',
+      persona: null
     }
   },
   computed: {
     username () {
-      return 'username > ' + this.pageName
+      if (this.pageName === 'Home') {
+        return 'Home'
+      }
+
+      this.updatePersona()
+
+      if (!this.persona) {
+        return 'loading... > ' + this.pageName
+      }
+
+      return this.persona.firstName + ' > ' + this.pageName
     }
   },
+  created () {
+    this.updatePersona()
+  },
   methods: {
+    updatePersona () {
+      if (this.$currentID.value) {
+        this.$client.personas.show(this.$currentID.value).then((persona) => {
+          this.persona = persona
+        }).catch(() => undefined) // noop
+      }
+    },
     setPage (item) {
       this.pageName = item.title
     },

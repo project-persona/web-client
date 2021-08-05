@@ -3,49 +3,54 @@
     <v-col>
       <v-simple-table dark>
         <thead>
-          <tr>
-            <th id="th" class="text-center" width="33%">
-              SITE
-            </th>
-            <th id="th" class="text-center" width="33%">
-              PASSWORD
-            </th>
-            <th />
-          </tr>
+        <tr>
+          <th class="table-header text-center" width="33%">
+            SITE
+          </th>
+          <th class="table-header text-center" width="33%">
+            PASSWORD
+          </th>
+          <th/>
+        </tr>
         </thead>
         <tbody>
-          <tr v-for="pw in pwList" :key="pw.site" align="center">
-            <td>{{ pw.name.toUpperCase() }}</td>
-            <td class="text-center">
-              {{ pw.show ? pw.password : '#######' }}
-            </td>
-            <td>
-              <v-btn icon class="icon" @click="pw.show = !pw.show">
-                <v-icon>
-                  {{ pw.show ? 'mdi-eye' : 'mdi-eye-off' }}
-                </v-icon>
-              </v-btn>
-              <v-btn
-                text
-                outlined
-                class="icon"
-                @click="editOn(pw._id)"
-              >
-                Edit
-              </v-btn>
-              <v-btn
-                text
-                outlined
-                class="icon"
-                @click="deletePw(pw._id)"
-              >
-                Delete
-              </v-btn>
-            </td>
-          </tr>
+        <tr v-for="pw in pwList" :key="pw._id" align="center">
+          <td>{{ pw.name }}</td>
+          <td class="text-center">
+            <template v-if="show.get(pw._id)">
+              {{ pw.password }}
+            </template>
+            <template v-else>
+              *******
+            </template>
+          </td>
+          <td>
+            <v-btn icon class="icon" @click.stop="toggleShow(pw._id)">
+              <v-icon>
+                {{ pw.show ? 'mdi-eye' : 'mdi-eye-off' }}
+              </v-icon>
+            </v-btn>
+            <v-btn
+              text
+              outlined
+              class="icon"
+              @click="editOn(pw._id)"
+            >
+              Edit
+            </v-btn>
+            <v-btn
+              text
+              outlined
+              class="icon"
+              @click="deletePw(pw._id)"
+            >
+              Delete
+            </v-btn>
+          </td>
+        </tr>
         </tbody>
       </v-simple-table>
-      <p />
+      <p/>
       <v-row dense justify="center" margin="30px">
         <v-dialog
           v-model="dialog"
@@ -83,7 +88,7 @@
               >
                 Edit the Password
               </v-toolbar-title>
-              <v-spacer />
+              <v-spacer/>
               <v-toolbar-items>
                 <v-btn
                   v-if="forCreate"
@@ -112,7 +117,7 @@
               lazy-validation
             >
               <v-text-field
-                v-model="pwData.site"
+                v-model="pwData.name"
                 label="Site"
                 :rules="[v => !!v || 'Site name is required']"
                 required
@@ -124,7 +129,7 @@
                 required
               />
               <v-text-field
-                v-model="pwData.userName"
+                v-model="pwData.username"
                 label="User Name"
                 :rules="[v => !!v || 'User name is required']"
                 required
@@ -166,12 +171,12 @@
   </v-row>
 </template>
 <script>
-function Password (site, uri, userName, password) {
-  this.name = site
-  this.uri = uri
-  this.username = userName
-  this.password = password
-}
+// function Password (site, uri, userName, password) {
+//   this.name = site
+//   this.uri = uri
+//   this.username = userName
+//   this.password = password
+// }
 export default {
   layout: 'dashboard',
   data () {
@@ -185,18 +190,17 @@ export default {
       currentPass: '',
       pwList: [],
       pwData: {
-        site: '',
+        name: '',
         uri: '',
-        userName: '',
+        username: '',
         password: ''
-      }
+      },
+      show: new Map()
     }
   },
   computed: {
     disable () {
-      if (this.pwData.site !== '' && this.pwData.password !== '' && this.pwData.uri !== '' && this.pwData.userName !== '') {
-        return false
-      } else { return true }
+      return !(this.pwData.name !== '' && this.pwData.password !== '' && this.pwData.uri !== '' && this.pwData.username !== '')
     }
   },
   async created () {
@@ -210,12 +214,14 @@ export default {
     }
 
     this.pwList = await this.$client.passwords.list(this.$currentID.value)
-    for (let i = 0; i < this.pwList.length; i++) {
-      this.pwList[i].show = false
-    }
     this.overlay = false
   },
   methods: {
+    toggleShow (id) {
+      this.show.set(id, !this.show.get(id))
+      this.pwList.push(null)
+      this.pwList.pop()
+    },
     createOn () {
       this.forCreate = true
       this.forEdit = false
@@ -227,18 +233,16 @@ export default {
       const targetPass = this.pwList.find((item) => {
         return item._id === id
       })
-      this.pwData.site = targetPass.name
-      this.pwData.userName = targetPass.username
+      this.pwData.name = targetPass.name
+      this.pwData.username = targetPass.username
       this.pwData.uri = targetPass.uri
       this.pwData.password = targetPass.password
       this.dialog = true
     },
     async create () {
       this.overlay = true
-      const newPassword = new Password(this.pwData.site, this.pwData.uri, this.pwData.userName, this.pwData.password)
       try {
-        const res = await this.$client.passwords.create(this.$currentID.value, newPassword)
-        res.show = false
+        const res = await this.$client.passwords.create(this.$currentID.value, this.pwData)
         this.pwList.push(res)
       } catch (error) {
         this.overlay = false
@@ -258,10 +262,9 @@ export default {
     },
     async edit () {
       this.overlay = true
-      const changePassword = new Password(this.pwData.site, this.pwData.uri, this.pwData.userName, this.pwData.password)
       try {
-        await this.$client.passwords.edit(this.currentPass, changePassword)
-        this.pwList = await this.$client.passwords.list(this.$currentID.value)
+        const res = await this.$client.passwords.edit(this.currentPass, this.pwData)
+        this.pwList = this.pwList.map(pw => pw._id === res._id ? res : pw)
       } catch (error) {
         this.snackbarMsg = error
         this.snackbar = true
@@ -274,7 +277,7 @@ export default {
       this.overlay = true
       try {
         await this.$client.passwords.delete(id)
-        this.pwList = await this.$client.passwords.list(this.$currentID.value)
+        this.pwList = this.pwList.filter(pw => pw._id !== id)
       } catch (error) {
         this.snackbarMsg = 'An error occurred, please try again'
         this.snackbar = true
@@ -287,11 +290,12 @@ export default {
 }
 </script>
 <style>
-  #th {
-    font-size: 20px;
-  }
-  .icon {
-    float: right;
-    margin-left: 10px;
-  }
+.table-header {
+  font-size: 20px;
+}
+
+.icon {
+  float: right;
+  margin-left: 10px;
+}
 </style>

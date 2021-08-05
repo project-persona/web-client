@@ -33,7 +33,7 @@
               </v-icon>
             </v-btn>
           </v-list-item-action>
-          <v-list-item-icon class="my-auto">
+          <!--v-list-item-icon class="my-auto">
             <v-badge
               :content="mail"
               :value="mail"
@@ -41,7 +41,7 @@
             >
               <v-icon>mdi-email</v-icon>
             </v-badge>
-          </v-list-item-icon>
+          </v-list-item-icon-->
         </v-list-item>
       </v-list>
       <p v-if="personas.length" class="bottom-text">
@@ -356,7 +356,7 @@ export default {
         'Non-Binary'
       ],
       date: null,
-      mail: 3
+      mail: 0
     }
   },
   computed: {
@@ -415,8 +415,10 @@ export default {
         await this.$client.personas.delete(id)
         this.personas = await this.$client.personas.list()
       } catch (error) {
-        this.snackbarMsg = 'An error occurred, please try again'
+        this.snackbarMsg = error.message
         this.snackbar = true
+      } finally {
+        this.$currentID.value = ''
       }
       this.overlay = false
       this.snackbarMsg = 'Delete Successfully'

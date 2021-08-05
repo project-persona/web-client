@@ -1,5 +1,13 @@
 <template>
   <v-row id="list" justify="center">
+    <v-col>
+      <div class="pagetitle">
+        <span>Emails</span>
+      </div>
+      <div>
+        <span>Your email address: <strong>{{ persona ? persona.email : 'loading...' }}</strong></span>
+      </div>
+    </v-col>
     <v-expansion-panels inset>
       <v-expansion-panel
         v-for="mail in mailList"
@@ -70,6 +78,9 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
+    <p v-if="!mailList.length" class="bottom-text">
+      No email received yet.
+    </p>
     <v-snackbar
       v-model="snackbar"
       :multi-line="true"
@@ -116,7 +127,8 @@ export default {
       snackbar: false,
       snackbarMsg: '',
       mailList: [],
-      timeoutHandler: 0
+      timeoutHandler: 0,
+      persona: null
     }
   },
   async created () {
@@ -129,7 +141,14 @@ export default {
       return await this.$router.push('/personas')
     }
 
-    this.mailList = await this.$client.emails.list(this.$currentID.value)
+    try {
+      this.persona = await this.$client.personas.show(this.$currentID.value)
+      this.mailList = await this.$client.emails.list(this.$currentID.value)
+    } catch (error) {
+      this.snackbarMsg = error.message
+      this.snackbar = true
+    }
+
     this.overlay = false
 
     const refresh = () => {
@@ -161,7 +180,7 @@ export default {
         await this.$client.emails.delete(id)
         this.mailList = await this.$client.emails.list(this.$currentID.value)
       } catch (error) {
-        this.snackbarMsg = 'An error occurred, please try again'
+        this.snackbarMsg = error.message
         this.snackbar = true
       }
       this.overlay = false
@@ -172,6 +191,11 @@ export default {
 }
 </script>
 <style>
+.pagetitle {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
 .content {
   margin: 30px;
 }
